@@ -15,6 +15,7 @@ import butterknife.OnClick;
 import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
+import ru.fixapp.fooproject.presentationlayer.fragments.recording.RecordingScreenFragment;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
 
 public class RecordListScreenFragment extends BaseFragment<RecordListPresenter> implements RecordListView {
@@ -46,7 +47,7 @@ public class RecordListScreenFragment extends BaseFragment<RecordListPresenter> 
 
 	@Override
 	public void openRecordDetail(String absolutePath) {
-//		getNavigation().showFragment(RecordingScreenFragment.open(absolutePath));
+		getNavigation().showFragment(RecordingScreenFragment.open(absolutePath));
 	}
 	@Override
 	public void daggerInject(ActivityComponent component) {
@@ -63,6 +64,6 @@ public class RecordListScreenFragment extends BaseFragment<RecordListPresenter> 
 
 	@OnClick(R.id.list_fab)
 	void onClickAdd(){
-//		getNavigation().showFragment(RecordingScreenFragment.create());
+		getNavigation().showFragment(RecordingScreenFragment.create());
 	}
 }

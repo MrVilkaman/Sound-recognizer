@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<TextView
+		android:id="@+id/recording_audio_info"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:layout_gravity="center_horizontal"
+		android:layout_marginTop="16dp"
+		tools:text="asdasdasdasdasdsa"/>
+
+	<!--<com.mrvilkaman.sounddetector.presentationlayer.customview.VisualizerView-->
+		<!--android:id="@+id/recording_audio_visualizerview"-->
+		<!--android:layout_marginTop="96dp"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="160dp"/>-->
+
+
+	<LinearLayout
+		android:layout_marginTop="96dp"
+
+		style="@style/LL.V"
+		android:layout_gravity="center">
+
+		<Button
+			android:id="@+id/recording_play"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:text="Проиграть"/>
+
+		<Button
+			android:id="@+id/recording_record"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:text="Записать"/>
+	</LinearLayout>
+
+</FrameLayout>
