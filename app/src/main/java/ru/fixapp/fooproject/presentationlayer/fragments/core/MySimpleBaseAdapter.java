@@ -71,7 +71,9 @@ public abstract class MySimpleBaseAdapter<T, VH extends BaseVH<T>>
 		this.onClick = onClick;
 	}
 
-	protected abstract DiffUtil.Callback getDiffCallback(List<T> oldItems, List<T> newItems);
+	protected DiffUtil.Callback getDiffCallback(List<T> oldItems, List<T> newItems){
+		return null;
+	}
 
 	public interface OnClickListener<T> {
 		void click(T category);
