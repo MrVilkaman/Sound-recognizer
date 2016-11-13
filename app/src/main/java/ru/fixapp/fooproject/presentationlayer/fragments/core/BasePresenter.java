@@ -40,6 +40,7 @@ public class BasePresenter<V extends BaseView> {
 		for (UseCase useCase : useCaseList) {
 			useCase.unsubscribe();
 		}
+		compositeSubscription.clear();
 	}
 
 	public final V view() {

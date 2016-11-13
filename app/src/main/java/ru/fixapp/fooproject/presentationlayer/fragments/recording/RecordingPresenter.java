@@ -4,23 +4,21 @@ import javax.inject.Inject;
 
 import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.datalayer.subscriber.ErrorSubscriber;
+import ru.fixapp.fooproject.datalayer.subscriber.ViewSubscriber;
+import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
 
 public class RecordingPresenter extends BasePresenter<RecordingView> {
 
-	private IAudioRecorderInteractor audioRecorder;
-//
-//	private GetLastAudioUpdatesUseCase audioUpdates;
-//	private PlayLastAudioUseCase playLastAudio;
+	private final IAudioRecorderInteractor audioRecorder;
+	private final AudioPlayerInteractor audioPlayerInteractor;
 
 	@Inject
-	public RecordingPresenter(
-			IAudioRecorderInteractor audioRecorder
-			// GetLastAudioUpdatesUseCase audioUpdates,
-//							  PlayLastAudioUseCase playLastAudio
-	) {
+	public RecordingPresenter(IAudioRecorderInteractor audioRecorder,
+							  AudioPlayerInteractor audioPlayerInteractor) {
 		this.audioRecorder = audioRecorder;
+		this.audioPlayerInteractor = audioPlayerInteractor;
 	}
 
 	@Override
@@ -31,7 +29,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 			view().hideRecordButton();
 		}
 
-//		audioUpdates.setCurrentPath(currentPath).execute(new GetLastAudioUpdatesSubscriber(view()));
+		//		audioUpdates.setCurrentPath(currentPath).execute(new GetLastAudioUpdatesSubscriber(view()));
 	}
 
 
@@ -40,7 +38,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void stopRecording() {
-		subscribe(audioRecorder.stop(), new ErrorSubscriber<Void>(view()){
+		subscribe(audioRecorder.stop(), new ErrorSubscriber<Void>(view()) {
 			@Override
 			public void onCompleted() {
 				view().showToast(R.string.audio_recorded);
@@ -49,18 +47,18 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void playLastAudio() {
-//		playLastAudio.setCurrentPath(view().getCurrentPath()).execute(new ViewSubscriber<RecordingView,Integer>(view()) {
-//			@Override
-//			public void onNext(Integer integer) {
-////				view().setupVisualizerFxAndUI(integer);
-//			}
-//
-//			@Override
-//			public void onCompleted() {
-//				super.onCompleted();
-//				view().showViz();
-//
-//			}
-//		});
+		subscribeUI(audioPlayerInteractor.play(view().getCurrentPath()),new ViewSubscriber<RecordingView,Integer>(view()) {
+			@Override
+			public void onNext(Integer integer) {
+				//				view().setupVisualizerFxAndUI(integer);
+			}
+
+			@Override
+			public void onCompleted() {
+				super.onCompleted();
+				view().showViz();
+
+			}
+		});
 	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ru.fixapp.fooproject.datalayer.subscriber.ViewSubscriber;
+import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
