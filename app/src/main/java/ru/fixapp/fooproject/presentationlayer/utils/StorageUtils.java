@@ -6,12 +6,20 @@ import android.os.Environment;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 
 public class StorageUtils {
 
-	public String getStoragePath(Context context) {
-		if (context == null)
-			return null;
+
+	private Context context;
+
+	@Inject
+	public StorageUtils(Context context) {
+		this.context = context;
+	}
+
+	public String getStoragePath() {
 
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {

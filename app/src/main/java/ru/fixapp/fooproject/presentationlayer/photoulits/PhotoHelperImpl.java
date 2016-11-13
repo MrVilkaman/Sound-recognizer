@@ -58,7 +58,7 @@ public class PhotoHelperImpl implements PhotoHelper {
 	}
 
 	private String getPathToTempFiles() {
-		return storageUtils.getStoragePath(context) + File.separator + IMAGE_TEMP + File.separator;
+		return storageUtils.getStoragePath() + File.separator + IMAGE_TEMP + File.separator;
 	}
 
 	@Override

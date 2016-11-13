@@ -3,7 +3,10 @@ package ru.fixapp.fooproject.presentationlayer.activities;
 
 import android.content.Context;
 
+import net.jokubasdargis.rxbus.Bus;
+
 import dagger.Component;
+import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.di.AppComponent;
 import ru.fixapp.fooproject.di.PerActivity;
 import ru.fixapp.fooproject.di.modules.activity.CommonActivityModule;
@@ -41,5 +44,9 @@ public interface ActivityComponent {
 	ImageLoader provideImageLoader();
 
 	StorageUtils storageUtils();
+
+	Bus provideBus();
+
+	AudioRepo provideAudioRepo();
 
 }

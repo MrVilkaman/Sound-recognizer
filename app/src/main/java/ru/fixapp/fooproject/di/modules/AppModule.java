@@ -33,7 +33,7 @@ public class AppModule {
 	@NonNull
 	@Singleton
 	public StorageUtils provideStorageUtils() {
-		return new StorageUtils();
+		return new StorageUtils(context);
 	}
 
 }

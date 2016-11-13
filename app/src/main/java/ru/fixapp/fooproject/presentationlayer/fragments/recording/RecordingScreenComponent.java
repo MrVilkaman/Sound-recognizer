@@ -1,9 +1,15 @@
 package ru.fixapp.fooproject.presentationlayer.fragments.recording;
 
 
+import net.jokubasdargis.rxbus.Bus;
+
 import dagger.Component;
 import dagger.Module;
+import dagger.Provides;
+import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.di.PerScreen;
+import ru.fixapp.fooproject.domainlayer.interactors.AudioRecorderInteractor;
+import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 
 @PerScreen
@@ -15,10 +21,10 @@ public interface RecordingScreenComponent {
 
 	@Module
 	class RecordingScreenModule {
-//		@Provides
-//		@PerScreen
-//		IAudioRecorder recorder(AudioRecordDP recordDP) {
-//			return new AudioRecorder(recordDP);
-//		}
+		@Provides
+		@PerScreen
+		IAudioRecorderInteractor recorder(AudioRepo recordDP, Bus bus) {
+			return new AudioRecorderInteractor(recordDP, bus);
+		}
 	}
 }
