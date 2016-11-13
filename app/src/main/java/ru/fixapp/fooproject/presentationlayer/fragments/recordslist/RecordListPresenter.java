@@ -1,49 +1,48 @@
 package ru.fixapp.fooproject.presentationlayer.fragments.recordslist;
 
 
+import java.util.List;
+
 import javax.inject.Inject;
 
+import ru.fixapp.fooproject.datalayer.subscriber.ViewSubscriber;
+import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
 
 public class RecordListPresenter extends BasePresenter<RecordListView> {
 
-//	private GetAudioListUseCase listUseCase;
-//	private DeleteFileUseCase deleteFileUseCase;
+	private AudioStorageInteractor storageInteractor;
 
 	@Inject
-	public RecordListPresenter(
-//			GetAudioListUseCase listUseCase,
-//							   DeleteFileUseCase deleteFileUseCase
-	) {
-//		this.listUseCase = listUseCase;
-//		this.deleteFileUseCase = deleteFileUseCase;
-
-//		addUseCases(deleteFileUseCase, listUseCase);
+	public RecordListPresenter(AudioStorageInteractor storageInteractor) {
+		this.storageInteractor = storageInteractor;
 	}
 
 	@Override
 	public void onViewAttached() {
 		super.onViewAttached();
-//		listUseCase.execute(new ViewSubscriber<RecordListView, List<AudioModel>>(view()) {
-//			@Override
-//			public void onNext(List<AudioModel> items) {
-//				view().bind(items);
-//			}
-//		});
+		subscribeUI(storageInteractor.getAudio(), new RecordListViewListViewSubscriber(view()));
 	}
 
 	public void openRecordDetail(String absolutePath) {
 		view().openRecordDetail(absolutePath);
 	}
 
-	public void deleteFile(AudioModel category) {
-//		deleteFileUseCase.setModel(category)
-//				.execute(new ViewSubscriber<RecordListView, AudioModel>(view()) {
-//					@Override
-//					public void onNext(AudioModel audioModel) {
-//						view().delete(audioModel);
-//					}
-//				});
+	public void deleteFile(AudioModel audioModel) {
+		storageInteractor.deleteFileByPath(audioModel);
+		view().delete(audioModel);
+	}
+
+	private static class RecordListViewListViewSubscriber
+			extends ViewSubscriber<RecordListView, List<AudioModel>> {
+		public RecordListViewListViewSubscriber(RecordListView view) {
+			super(view);
+		}
+
+		@Override
+		public void onNext(List<AudioModel> items) {
+			view().bind(items);
+		}
 	}
 }
