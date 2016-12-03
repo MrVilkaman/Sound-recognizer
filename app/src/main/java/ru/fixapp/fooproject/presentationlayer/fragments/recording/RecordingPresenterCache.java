@@ -38,4 +38,8 @@ public class RecordingPresenterCache {
 		outState.putBoolean(KEY_CAN_RECORD, canRecord);
 		outState.putString(KEY_PATH, path);
 	}
+
+	public void setNewPath(String newPathForAudio) {
+		path = newPathForAudio;
+	}
 }

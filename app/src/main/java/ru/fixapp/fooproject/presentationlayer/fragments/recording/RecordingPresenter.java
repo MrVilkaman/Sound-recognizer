@@ -6,6 +6,7 @@ import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.datalayer.subscriber.ErrorSubscriber;
 import ru.fixapp.fooproject.datalayer.subscriber.ViewSubscriber;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractor;
+import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
 
@@ -13,14 +14,17 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 
 	private final IAudioRecorderInteractor audioRecorder;
 	private final AudioPlayerInteractor audioPlayerInteractor;
+	private final AudioStorageInteractor storageInteractor;
 	private final RecordingPresenterCache cache;
 
 	@Inject
 	public RecordingPresenter(IAudioRecorderInteractor audioRecorder,
 							  AudioPlayerInteractor audioPlayerInteractor,
+							  AudioStorageInteractor storageInteractor,
 							  RecordingPresenterCache cache) {
 		this.audioRecorder = audioRecorder;
 		this.audioPlayerInteractor = audioPlayerInteractor;
+		this.storageInteractor = storageInteractor;
 		this.cache = cache;
 	}
 
@@ -31,9 +35,8 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 			view().hideRecordButton();
 		}
 		if(!cache.hasPath()){
-			// get new
+			cache.setNewPath(storageInteractor.getNewPathForAudio());
 		}
-
 	}
 
 

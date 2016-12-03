@@ -29,6 +29,11 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 	}
 
 	@Override
+	public String getNewPathForAudio() {
+		return recordDP.getNextPathForAudio().toBlocking().first();
+	}
+
+	@Override
 	public void deleteFileByPath(AudioModel path) {
 		new File(path.getAbsolutePath()).delete();
 	}

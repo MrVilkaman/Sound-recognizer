@@ -10,5 +10,7 @@ public interface AudioStorageInteractor {
 
 	Observable<List<AudioModel>> getAudio();
 
+	String getNewPathForAudio();
+
 	void deleteFileByPath(AudioModel path);
 }
