@@ -4,7 +4,7 @@ import rx.Observable;
 
 public interface IAudioRecorderInteractor {
 
-    Observable<Void> start();
+    Observable<Void> start(String path);
 
     Observable<Void> stop();
 }

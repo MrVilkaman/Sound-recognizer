@@ -6,8 +6,6 @@ public interface RecordingView extends BaseView {
 
 	void showAudioInfo(String textAudio);
 
-	String getCurrentPath();
-
 	void hideRecordButton();
 
 	void setupVisualizerFxAndUI(int audioSessionId);

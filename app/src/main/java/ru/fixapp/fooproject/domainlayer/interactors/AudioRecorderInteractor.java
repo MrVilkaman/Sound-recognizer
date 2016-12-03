@@ -6,7 +6,6 @@ import net.jokubasdargis.rxbus.Bus;
 
 import java.io.IOException;
 
-import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.presentationlayer.models.AudioEvents;
 import ru.fixapp.fooproject.presentationlayer.models.QueriesBus;
 import rx.Observable;
@@ -14,37 +13,34 @@ import rx.Observable;
 public class AudioRecorderInteractor implements IAudioRecorderInteractor {
 
 	private final Bus bus;
-	private final AudioRepo recordDP;
 
 	private MediaRecorder recorder;
 
-	public AudioRecorderInteractor(AudioRepo recordDP, Bus bus) {
-		this.recordDP = recordDP;
+	public AudioRecorderInteractor(Bus bus) {
 		this.bus = bus;
 	}
 
 	@Override
-	public Observable<Void> start() {
-		return recordDP.getNextPathForAudio()
-				.concatMap(nextPathForAudio -> Observable.create(subscriber -> {
-					recorder = new MediaRecorder();
-					recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-					recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-					recorder.setOutputFile(nextPathForAudio);
-					recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-					recorder.setAudioEncodingBitRate(64);
-					recorder.setAudioSamplingRate(44100);
+	public Observable<Void> start(String path) {
+		return Observable.create(subscriber -> {
+			recorder = new MediaRecorder();
+			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+			recorder.setOutputFile(path);
+			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+			recorder.setAudioEncodingBitRate(64);
+			recorder.setAudioSamplingRate(44100);
 
-					try {
-						recorder.prepare();
-						recorder.start();
-						if (!subscriber.isUnsubscribed())
-							subscriber.onCompleted();
-					} catch (IOException e) {
-						if (!subscriber.isUnsubscribed())
-							subscriber.onError(e);
-					}
-				}));
+			try {
+				recorder.prepare();
+				recorder.start();
+				if (!subscriber.isUnsubscribed())
+					subscriber.onCompleted();
+			} catch (IOException e) {
+				if (!subscriber.isUnsubscribed())
+					subscriber.onError(e);
+			}
+		});
 	}
 
 	@Override

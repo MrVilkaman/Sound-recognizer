@@ -3,13 +3,17 @@ package ru.fixapp.fooproject.presentationlayer.fragments.recording;
 
 import android.media.audiofx.Visualizer;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -18,9 +22,12 @@ import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
 
-public class RecordingScreenFragment extends BaseFragment<RecordingPresenter> implements RecordingView {
+public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
+		implements RecordingView {
 
 	private static final String PATH = "extra_path";
+
+	@Inject RecordingPresenterCache cache;
 
 	@BindView(R.id.recording_audio_info) TextView textView;
 	@BindView(R.id.recording_record) View recordButton;
@@ -46,17 +53,26 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter> im
 	}
 
 	@Override
-	protected void onCreateView(View view, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		// dirty hack!! need more flexible way!
+		cache.restoreState(savedInstanceState);
+		Bundle arguments = getArguments();
+		if (arguments != null) {
+			cache.setCurrentPath(arguments.getString(PATH));
+		}
 
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override
-	public String getCurrentPath() {
-		Bundle arguments = getArguments();
-		if (arguments == null) {
-			return null;
-		}
-		return arguments.getString(PATH);
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		cache.onSaveInstanceState(outState);
+	}
+
+	@Override
+	protected void onCreateView(View view, Bundle savedInstanceState) {
 	}
 
 	@Override
@@ -135,7 +151,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter> im
 			}
 			byte[] bytes = bos.toByteArray();
 //			visualizerView.updateVisualizer(bytes);
-		}catch (Exception e){
+		} catch (Exception e) {
 			handleError(e);
 		}
 	}

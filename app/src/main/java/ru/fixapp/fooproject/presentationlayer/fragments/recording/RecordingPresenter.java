@@ -13,28 +13,32 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 
 	private final IAudioRecorderInteractor audioRecorder;
 	private final AudioPlayerInteractor audioPlayerInteractor;
+	private final RecordingPresenterCache cache;
 
 	@Inject
 	public RecordingPresenter(IAudioRecorderInteractor audioRecorder,
-							  AudioPlayerInteractor audioPlayerInteractor) {
+							  AudioPlayerInteractor audioPlayerInteractor,
+							  RecordingPresenterCache cache) {
 		this.audioRecorder = audioRecorder;
 		this.audioPlayerInteractor = audioPlayerInteractor;
+		this.cache = cache;
 	}
 
 	@Override
 	public void onViewAttached() {
 		super.onViewAttached();
-		String currentPath = view().getCurrentPath();
-		if (currentPath != null) {
+		if (!cache.canRecord()) {
 			view().hideRecordButton();
 		}
+		if(!cache.hasPath()){
+			// get new
+		}
 
-		//		audioUpdates.setCurrentPath(currentPath).execute(new GetLastAudioUpdatesSubscriber(view()));
 	}
 
 
 	public void startRecording() {
-		subscribe(audioRecorder.start(), new ErrorSubscriber<>(view()));
+		subscribe(audioRecorder.start(cache.getPath()), new ErrorSubscriber<>(view()));
 	}
 
 	public void stopRecording() {
@@ -47,18 +51,18 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void playLastAudio() {
-		subscribeUI(audioPlayerInteractor.play(view().getCurrentPath()),new ViewSubscriber<RecordingView,Integer>(view()) {
-			@Override
-			public void onNext(Integer integer) {
-				//				view().setupVisualizerFxAndUI(integer);
-			}
+		subscribeUI(audioPlayerInteractor.play(cache.getPath()),
+				new ViewSubscriber<RecordingView, Integer>(view()) {
+					@Override
+					public void onNext(Integer integer) {
+						//				view().setupVisualizerFxAndUI(integer);
+					}
 
-			@Override
-			public void onCompleted() {
-				super.onCompleted();
-				view().showViz();
-
-			}
-		});
+					@Override
+					public void onCompleted() {
+						super.onCompleted();
+						view().showViz();
+					}
+				});
 	}
 }

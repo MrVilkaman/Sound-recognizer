@@ -8,7 +8,6 @@ import net.jokubasdargis.rxbus.Bus;
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
-import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.di.PerScreen;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractorImpl;
@@ -20,22 +19,27 @@ import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 @Component(dependencies = ActivityComponent.class,
 		modules = {RecordingScreenComponent.RecordingScreenModule.class})
 public interface RecordingScreenComponent {
-	void inject(RecordingScreenFragment fragment);
 
+	void inject(RecordingScreenFragment fragment);
 
 	@Module
 	class RecordingScreenModule {
 		@Provides
 		@PerScreen
-		IAudioRecorderInteractor recorder(AudioRepo recordDP, Bus bus) {
-			return new AudioRecorderInteractor(recordDP, bus);
+		IAudioRecorderInteractor recorder(Bus bus) {
+			return new AudioRecorderInteractor(bus);
 		}
-
 
 		@PerScreen
 		@Provides
 		AudioPlayerInteractor provideAudioPlayer(Context context){
 			return new AudioPlayerInteractorImpl(context);
+		}
+
+		@PerScreen
+		@Provides
+		RecordingPresenterCache provideRecordingPresenterCache(){
+			return new RecordingPresenterCache();
 		}
 	}
 }
