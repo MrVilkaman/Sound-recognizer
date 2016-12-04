@@ -13,4 +13,6 @@ public interface RecordingView extends BaseView {
 	void showViz();
 
 	void showBytes(String absolutePath);
+
+	void setRangeTime(String text);
 }

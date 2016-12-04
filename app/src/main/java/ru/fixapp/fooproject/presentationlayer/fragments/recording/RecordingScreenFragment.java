@@ -210,7 +210,8 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 				uiResolver.showToast(R.string.simple_text,entryForXPos.getX());
 
 				float v = 1000f *  iLineDataSet.getXMax() / cache.getDuraction();
-				cache.setOffset(entryForXPos.getX()/v);
+				float offset = entryForXPos.getX() / v;
+				getPresenter().setNextTimePoint(offset);
 			}
 
 			@Override
@@ -218,10 +219,19 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 			}
 		});
 
+		Highlight h1 = new Highlight(0,0,1);
+		Highlight h2 = new Highlight(0,0,2);
+		lineChart.highlightValues(new Highlight[] {h1, h2});
+
 
 		LineData lineData = new LineData(dataSet);
 		lineChart.setData(lineData);
 		lineChart.invalidate();
+	}
+
+	@Override
+	public void setRangeTime(String text) {
+		textView2.setText(text);
 	}
 
 	@Override

@@ -24,4 +24,8 @@ public class RecordsFormat {
 		String format2 = String.format("Размер %s кб", String.valueOf(item.getSize() / 1024));
 		return name + '\n' + type + '\n' + format + '\n' + format2;
 	}
+
+	public String formatOffset(float start, float end) {
+		return String.format("%1.2f - %2.2f",start,end);
+	}
 }

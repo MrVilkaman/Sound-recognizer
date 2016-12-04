@@ -53,6 +53,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 							cache.setDuraction(model.getDuration());
 							view().showAudioInfo(recordsFormat.format(model));
 							view().showBytes(model.getAbsolutePath());
+							update();
 						}
 					});
 		}
@@ -74,7 +75,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void playLastAudio() {
-		subscribeUI(audioPlayerInteractor.play(cache.getPath(),cache.getOffset()),
+		subscribeUI(audioPlayerInteractor.play(cache.getPath(), cache.getStart(), cache.getEnd()),
 				new ViewSubscriber<RecordingView, Integer>(view()) {
 					@Override
 					public void onNext(Integer integer) {
@@ -87,5 +88,26 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 						view().showViz();
 					}
 				});
+	}
+
+	public void setNextTimePoint(float offset) {
+		boolean startNow = cache.isStartNow();
+		if (startNow) {
+			float max = Math.max(cache.getEnd(), offset);
+			float min = Math.min(cache.getEnd(), offset);
+			cache.setStart(min);
+			cache.setEnd(max);
+		} else {
+			float max = Math.max(cache.getStart(), offset);
+			float min = Math.min(cache.getStart(), offset);
+			cache.setStart(min);
+			cache.setEnd(max);
+		}
+		cache.setStartNow(!startNow);
+		update();
+	}
+
+	private void update() {
+		view().setRangeTime(recordsFormat.formatOffset(cache.getStart(), cache.getEnd()));
 	}
 }

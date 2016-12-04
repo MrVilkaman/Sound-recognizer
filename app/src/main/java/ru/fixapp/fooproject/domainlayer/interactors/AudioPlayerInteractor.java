@@ -4,7 +4,7 @@ package ru.fixapp.fooproject.domainlayer.interactors;
 import rx.Observable;
 
 public interface AudioPlayerInteractor {
-	Observable<Integer> play(String pathToFile,float offset);
+	Observable<Integer> play(String pathToFile, float offsetStart, float offsetEnd);
 
 	void stop();
 }
