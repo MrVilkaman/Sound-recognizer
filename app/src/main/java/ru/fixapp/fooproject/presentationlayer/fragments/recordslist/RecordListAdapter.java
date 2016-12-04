@@ -5,16 +5,25 @@ import android.view.View;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ru.fixapp.fooproject.R;
+import ru.fixapp.fooproject.presentationlayer.formaters.RecordsFormat;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.MySimpleBaseAdapter;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
 
 public class RecordListAdapter extends MySimpleBaseAdapter<AudioModel,RecordListVH> {
 	private OnClickListener<AudioModel> onLongClick;
+	private RecordsFormat recordsFormat;
+
+	@Inject
+	public RecordListAdapter(RecordsFormat recordsFormat) {
+		this.recordsFormat = recordsFormat;
+	}
 
 	@Override
 	protected RecordListVH getHolder(View view, OnClickListener<AudioModel> onClick) {
-		return new RecordListVH(view, onClick,onLongClick);
+		return new RecordListVH(view, onClick,onLongClick, recordsFormat);
 	}
 
 	@Override

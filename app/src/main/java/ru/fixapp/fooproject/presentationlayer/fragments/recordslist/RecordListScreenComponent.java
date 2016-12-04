@@ -20,12 +20,6 @@ public interface RecordListScreenComponent {
 	class ListSampleScreenModule {
 
 		@PerScreen
-		@Provides
-		RecordListAdapter provideRecordListAdapter(){
-			return new RecordListAdapter();
-		}
-
-		@PerScreen
 		@Provides AudioStorageInteractor provideAudioStorageInteractor(AudioRepo recordDP,
 																	   FileInfoConverter fileInfoConverter){
 			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter);
