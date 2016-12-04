@@ -74,7 +74,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void playLastAudio() {
-		subscribeUI(audioPlayerInteractor.play(cache.getPath()),
+		subscribeUI(audioPlayerInteractor.play(cache.getPath(),cache.getOffset()),
 				new ViewSubscriber<RecordingView, Integer>(view()) {
 					@Override
 					public void onNext(Integer integer) {

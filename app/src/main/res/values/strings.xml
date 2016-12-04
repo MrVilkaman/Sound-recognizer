@@ -1,6 +1,9 @@
 <resources>
 	<string name="app_name">Foo</string>
 
+	<string name="simple_text">%1$s</string>
+
+
 	<string name="exit_toast">Для выхода нажмите еще раз!</string>
 
 	<string name="dialog_server_error">Неожиданная ошибка на сервере</string>

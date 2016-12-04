@@ -19,12 +19,13 @@ public class AudioPlayerInteractorImpl implements AudioPlayerInteractor {
 	}
 
 	@Override
-	public Observable<Integer> play(String pathToFile) {
+	public Observable<Integer> play(String pathToFile,float offset) {
 		return Observable.create(subscriber -> {
 			stop();
 			mp = MediaPlayer.create(context, Uri.parse(pathToFile));
 			if (mp != null) {
 				subscriber.onNext(mp.getAudioSessionId());
+				mp.seekTo((int) (offset*1000));
 				mp.start();
 				mp.setOnCompletionListener(mp1 -> {
 					if (!subscriber.isUnsubscribed())

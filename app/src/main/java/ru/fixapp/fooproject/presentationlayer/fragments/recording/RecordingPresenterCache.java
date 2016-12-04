@@ -10,6 +10,7 @@ public class RecordingPresenterCache {
 	private String path;
 	private boolean canRecord = true;
 	private long duraction;
+	private float offset;
 
 	public boolean canRecord() {
 		return canRecord;
@@ -50,5 +51,13 @@ public class RecordingPresenterCache {
 
 	public long getDuraction() {
 		return duraction;
+	}
+
+	public float getOffset() {
+		return offset;
+	}
+
+	public void setOffset(float offset) {
+		this.offset = offset;
 	}
 }

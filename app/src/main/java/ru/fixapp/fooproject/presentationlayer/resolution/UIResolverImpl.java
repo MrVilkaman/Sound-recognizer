@@ -32,6 +32,12 @@ public class UIResolverImpl implements UIResolver {
 	}
 
 	@Override
+	public void showToast(@StringRes int textId, Object... arg) {
+		Toast.makeText(context, context.getString(textId,arg), Toast.LENGTH_SHORT)
+				.show();
+	}
+
+	@Override
 	public void showMessage(@StringRes int resId) {
 		MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
 		builder.content(resId)

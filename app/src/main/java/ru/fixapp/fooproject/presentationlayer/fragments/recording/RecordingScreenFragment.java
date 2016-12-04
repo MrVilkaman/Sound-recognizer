@@ -11,12 +11,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -193,12 +194,27 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		lineChart.setDrawGridBackground(false);
 
 
-		lineChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
+		lineChart.getXAxis().setValueFormatter((value, axis) -> {
+			float v = 1000f *  axis.mAxisMaximum / cache.getDuraction();
+
+			return String.format("%.2f",value/v);
+		});
+
+		lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
 			@Override
-			public String getFormattedValue(float value, AxisBase axis) {
-				float v = 1000f * axis.mAxisMaximum / cache.getDuraction();
-//				IAudioRecorderInteractor.SAMPLING_RATE
-				return String.format("%.2f",value/v);
+			public void onValueSelected(Entry e, Highlight h) {
+				List<ILineDataSet> dataSets = lineChart.getLineData().getDataSets();
+				float x = e.getX();
+				ILineDataSet iLineDataSet = dataSets.get(0);
+				Entry entryForXPos = iLineDataSet.getEntryForIndex((int) x);
+				uiResolver.showToast(R.string.simple_text,entryForXPos.getX());
+
+				float v = 1000f *  iLineDataSet.getXMax() / cache.getDuraction();
+				cache.setOffset(entryForXPos.getX()/v);
+			}
+
+			@Override
+			public void onNothingSelected() {
 			}
 		});
 
