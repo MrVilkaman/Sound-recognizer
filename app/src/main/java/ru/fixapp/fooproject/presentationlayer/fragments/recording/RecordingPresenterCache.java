@@ -9,6 +9,7 @@ public class RecordingPresenterCache {
 	public static final String KEY_PATH = "path";
 	private String path;
 	private boolean canRecord = true;
+	private long duraction;
 
 	public boolean canRecord() {
 		return canRecord;
@@ -41,5 +42,13 @@ public class RecordingPresenterCache {
 
 	public void setNewPath(String newPathForAudio) {
 		path = newPathForAudio;
+	}
+
+	public void setDuraction(long duraction) {
+		this.duraction = duraction;
+	}
+
+	public long getDuraction() {
+		return duraction;
 	}
 }

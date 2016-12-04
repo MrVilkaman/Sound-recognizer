@@ -50,6 +50,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 					new ViewSubscriber<RecordingView, AudioModel>(view()) {
 						@Override
 						public void onNext(AudioModel model) {
+							cache.setDuraction(model.getDuration());
 							view().showAudioInfo(recordsFormat.format(model));
 							view().showBytes(model.getAbsolutePath());
 						}

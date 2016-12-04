@@ -11,14 +11,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -38,6 +42,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@Inject RecordingPresenterCache cache;
 
 	@BindView(R.id.recording_audio_info) TextView textView;
+	@BindView(R.id.recording_audio_info_2) TextView textView2;
 	@BindView(R.id.recording_record) View recordButton;
 	@BindView(R.id.recording_audio_visualizerview) LineChart lineChart;
 
@@ -160,7 +165,8 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 				bos.write(b, 0, bytesRead);
 			}
 			byte[] bytes = bos.toByteArray();
-			updateVisualizer(bytes);
+			byte[] bytes1 = Arrays.copyOfRange(bytes, 3930, bytes.length);
+			updateVisualizer(bytes1);
 		} catch (Exception e) {
 			handleError(e);
 		}
@@ -176,6 +182,26 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		LineDataSet dataSet = new LineDataSet(entries, "Label");
 		dataSet.setColor(Color.BLUE);
 		dataSet.setValueTextColor(Color.BLACK);
+		dataSet.setDrawCircles(false);
+		dataSet.setDrawCircleHole(false);
+		dataSet.setDrawHorizontalHighlightIndicator(false);
+
+		lineChart.getLegend().setEnabled(false);
+		Description desc = new Description();
+		desc.setText("");
+		lineChart.setDescription(desc);
+		lineChart.setDrawGridBackground(false);
+
+
+		lineChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
+			@Override
+			public String getFormattedValue(float value, AxisBase axis) {
+				float v = 1000f * axis.mAxisMaximum / cache.getDuraction();
+//				IAudioRecorderInteractor.SAMPLING_RATE
+				return String.format("%.2f",value/v);
+			}
+		});
+
 
 		LineData lineData = new LineData(dataSet);
 		lineChart.setData(lineData);

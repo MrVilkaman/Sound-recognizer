@@ -23,12 +23,12 @@ public class FileInfoConverter {
 		String type;
 		long duration;
 		if (file.exists()) {
-			MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 			Uri uri = Uri.fromFile(file);
-			mediaMetadataRetriever.setDataSource(context, uri);
-			type = mediaMetadataRetriever
+			retriever.setDataSource(context, uri);
+			type = retriever
 					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-			duration = Long.parseLong(mediaMetadataRetriever
+			duration = Long.parseLong(retriever
 					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 		} else {
 			type = "";
