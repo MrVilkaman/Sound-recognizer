@@ -1,6 +1,7 @@
 package ru.fixapp.fooproject.presentationlayer.fragments.recording;
 
 
+import android.graphics.Color;
 import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,9 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -31,7 +39,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 
 	@BindView(R.id.recording_audio_info) TextView textView;
 	@BindView(R.id.recording_record) View recordButton;
-//	@BindView(R.id.recording_audio_visualizerview) VisualizerView visualizerView;
+	@BindView(R.id.recording_audio_visualizerview) LineChart lineChart;
 
 	private Visualizer mVisualizer;
 
@@ -131,6 +139,8 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@Override
 	public void showViz() {
 //		visualizerView.setEnabled(false);
+
+
 	}
 
 	@Override
@@ -150,10 +160,26 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 				bos.write(b, 0, bytesRead);
 			}
 			byte[] bytes = bos.toByteArray();
-//			visualizerView.updateVisualizer(bytes);
+			updateVisualizer(bytes);
 		} catch (Exception e) {
 			handleError(e);
 		}
+	}
+
+	private void updateVisualizer(byte[] bytes) {
+
+		List<Entry> entries = new ArrayList<>();
+		for (int i = 0; i < bytes.length; i++) {
+			entries.add(new Entry(i, bytes[i]));
+		}
+
+		LineDataSet dataSet = new LineDataSet(entries, "Label");
+		dataSet.setColor(Color.BLUE);
+		dataSet.setValueTextColor(Color.BLACK);
+
+		LineData lineData = new LineData(dataSet);
+		lineChart.setData(lineData);
+		lineChart.invalidate();
 	}
 
 	@Override

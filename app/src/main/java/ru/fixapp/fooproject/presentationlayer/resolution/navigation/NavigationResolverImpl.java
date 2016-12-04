@@ -5,9 +5,11 @@ import android.content.Intent;
 
 import java.util.concurrent.TimeUnit;
 
+import ru.fixapp.fooproject.BuildConfig;
 import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.presentationlayer.activities.BaseActivityView;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
+import ru.fixapp.fooproject.presentationlayer.fragments.recording.RecordingScreenFragment;
 import ru.fixapp.fooproject.presentationlayer.fragments.recordslist.RecordListScreenFragment;
 import ru.fixapp.fooproject.presentationlayer.resolution.UIResolver;
 import ru.fixapp.fooproject.presentationlayer.resolution.drawer.LeftDrawerHelper;
@@ -64,6 +66,9 @@ public class NavigationResolverImpl implements NavigationResolver {
 
 	@Override
 	public BaseFragment createStartFragment() {
+		if (BuildConfig.DEBUG) {
+			return RecordingScreenFragment.open("/storage/emulated/0/Android/data/ru.fixapp.fooproject/files/audio/151bef5f-29a6-462a-98f5-44b47d4ca885.3gpp");
+		}
 		return RecordListScreenFragment.open();
 	}
 

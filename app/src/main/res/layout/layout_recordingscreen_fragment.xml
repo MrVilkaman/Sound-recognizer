@@ -14,11 +14,12 @@
 		android:layout_marginTop="16dp"
 		tools:text="asdasdasdasdasdsa"/>
 
-	<!--<com.mrvilkaman.sounddetector.presentationlayer.customview.VisualizerView-->
-		<!--android:id="@+id/recording_audio_visualizerview"-->
-		<!--android:layout_marginTop="96dp"-->
-		<!--android:layout_width="match_parent"-->
-		<!--android:layout_height="160dp"/>-->
+
+	<com.github.mikephil.charting.charts.LineChart
+		android:id="@+id/recording_audio_visualizerview"
+		android:layout_marginTop="96dp"
+		android:layout_width="match_parent"
+		android:layout_height="160dp"/>
 
 
 	<LinearLayout

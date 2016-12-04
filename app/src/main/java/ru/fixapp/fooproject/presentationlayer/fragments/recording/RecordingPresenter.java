@@ -51,6 +51,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 						@Override
 						public void onNext(AudioModel model) {
 							view().showAudioInfo(recordsFormat.format(model));
+							view().showBytes(model.getAbsolutePath());
 						}
 					});
 		}
