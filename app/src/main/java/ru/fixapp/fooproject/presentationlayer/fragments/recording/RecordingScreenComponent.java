@@ -12,10 +12,9 @@ import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.di.PerScreen;
 import ru.fixapp.fooproject.domainlayer.FileInfoConverter;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractor;
-import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractorImpl;
-import ru.fixapp.fooproject.domainlayer.interactors.AudioRecorderInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractorImpl;
+import ru.fixapp.fooproject.domainlayer.interactors.AudioTrackPlayerInteractorImpl;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioTrackRecorderInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
@@ -45,7 +44,7 @@ public interface RecordingScreenComponent {
 		@PerScreen
 		@Provides
 		AudioPlayerInteractor provideAudioPlayer(Context context){
-			return new AudioPlayerInteractorImpl(context);
+			return new AudioTrackPlayerInteractorImpl(context);
 		}
 
 		@PerScreen

@@ -53,7 +53,6 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 
 	@Override
 	public Observable<Void> start(String path) {
-
 		return Observable.combineLatest(getAudioRecordObservable(),
 				getFileStreamObservable(path),(container, dataOutputStream) -> saveToFile(dataOutputStream, container)).ignoreElements().map(r -> null);
 	}
