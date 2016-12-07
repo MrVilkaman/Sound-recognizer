@@ -2,7 +2,6 @@ package ru.fixapp.fooproject.domainlayer.interactors;
 
 import android.content.Context;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.support.annotation.NonNull;
 
@@ -31,14 +30,6 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 		if (bufferSize == AudioTrack.ERROR || bufferSize == AudioTrack.ERROR_BAD_VALUE) {
 			bufferSize = IAudioRecorderInteractor.SAMPLING_RATE * 2;
 		}
-
-		audioTrack = new AudioTrack(
-				AudioManager.STREAM_MUSIC,
-				IAudioRecorderInteractor.SAMPLING_RATE,
-				AudioFormat.CHANNEL_OUT_MONO,
-				AudioFormat.ENCODING_PCM_16BIT,
-				bufferSize,
-				AudioTrack.MODE_STREAM);
 
 	}
 

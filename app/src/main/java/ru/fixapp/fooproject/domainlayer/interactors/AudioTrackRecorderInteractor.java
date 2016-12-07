@@ -42,19 +42,15 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 		if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE) {
 			bufferSize = SAMPLING_RATE * 2;
 		}
-
-		record = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION,
-				SAMPLING_RATE,
-				AudioFormat.CHANNEL_IN_MONO,
-				AudioFormat.ENCODING_PCM_16BIT,
-				bufferSize);
-		Log.d("Audio", "state init" + record.getState());
 	}
 
 	@Override
 	public Observable<Void> start(String path) {
 		return Observable.combineLatest(getAudioRecordObservable(),
-				getFileStreamObservable(path),(container, dataOutputStream) -> saveToFile(dataOutputStream, container)).ignoreElements().map(r -> null);
+				getFileStreamObservable(path),
+				(container, dataOutputStream) -> saveToFile(dataOutputStream, container))
+				.ignoreElements()
+				.map(r -> null);
 	}
 
 	@Nullable
@@ -81,7 +77,14 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 
 	private Observable<Container> getAudioRecordObservable() {
 		return Observable.fromCallable(() -> {
-			Log.d("Audio", "state " + record.getState());
+
+			record = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION,
+					SAMPLING_RATE,
+					AudioFormat.CHANNEL_IN_MONO,
+					AudioFormat.ENCODING_PCM_16BIT,
+					bufferSize);
+			Log.d("Audio", "state init" + record.getState());
+
 			record.startRecording();
 			return null;
 		})
@@ -90,17 +93,12 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 					@Override
 					public Observable<Container> call(Object o) {
 						return Observable.create(subscriber -> {
-							long shortsRead = 0;
 							short[] audioBuffer = new short[bufferSize / 2];
-							Log.d("Audio", "start Read");
 							while (record.getRecordingState() == RECORDSTATE_RECORDING) {
 								int numberOfShort = record.read(audioBuffer, 0, audioBuffer
 										.length);
-								shortsRead += numberOfShort;
 								subscriber.onNext(new Container(audioBuffer));
-								Log.d("Audio", "read =" + shortsRead);
 							}
-							Log.d("Audio", "stop Read");
 							if (!subscriber.isUnsubscribed())
 								subscriber.onCompleted();
 						});
@@ -113,10 +111,13 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 	@Override
 	public Observable<Void> stop() {
 		return Observable.fromCallable(() -> {
-			Log.d("Audio", "stop ");
-			record.stop();
-			record.release();
-			bus.publish(QueriesBus.AUDIO_EVENTS_QUEUE, AudioEvents.RECORDED);
+			if (record != null) {
+				Log.d("Audio", "stop ");
+				record.stop();
+				record.release();
+				bus.publish(QueriesBus.AUDIO_EVENTS_QUEUE, AudioEvents.RECORDED);
+			}
+			record = null;
 			return null;
 		});
 	}
