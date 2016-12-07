@@ -24,11 +24,11 @@ public class AudioRecorderInteractor implements IAudioRecorderInteractor {
 	public Observable<Void> start(String path) {
 		return Observable.create(subscriber -> {
 			recorder = new MediaRecorder();
-			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION);
 			recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 			recorder.setOutputFile(path);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-			recorder.setAudioEncodingBitRate(64);
+			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC_ELD);
+			recorder.setAudioEncodingBitRate(64000);
 			recorder.setAudioSamplingRate(SAMPLING_RATE);
 
 			try {
