@@ -9,9 +9,9 @@
 		android:id="@+id/recording_audio_info"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:layout_gravity="center_horizontal"
-		android:layout_marginTop="16dp"
+		android:layout_gravity="left|bottom"
+		android:layout_margin="8dp"
+		android:gravity="left"
 		tools:text="asdasdasdasdasdsa"/>
 
 
@@ -19,24 +19,24 @@
 		android:id="@+id/recording_audio_info_2"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:layout_gravity="right|bottom"
+		android:layout_margin="16dp"
 		android:gravity="center"
-		android:layout_gravity="center_horizontal|bottom"
-		android:layout_marginBottom="16dp"
 		tools:text="asdasdasdasdasdsa"/>
 
 
 	<com.github.mikephil.charting.charts.LineChart
 		android:id="@+id/recording_audio_visualizerview"
-		android:layout_marginTop="96dp"
 		android:layout_width="match_parent"
-		android:layout_height="160dp"/>
+		android:layout_height="160dp"
+		android:layout_marginTop="8dp"/>
 
 
 	<LinearLayout
-		android:layout_marginTop="96dp"
-
-		style="@style/LL.V"
-		android:layout_gravity="center">
+		style="@style/LL.H"
+		android:layout_gravity="bottom"
+		android:layout_marginBottom="8dp"
+		android:gravity="center_horizontal">
 
 		<Button
 			android:id="@+id/recording_play"
