@@ -1,8 +1,6 @@
 package ru.fixapp.fooproject.domainlayer;
 
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 
 import java.io.File;
 
@@ -22,18 +20,18 @@ public class FileInfoConverter {
 
 		String type;
 		long duration;
-		if (file.exists()) {
-			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-			Uri uri = Uri.fromFile(file);
-			retriever.setDataSource(context, uri);
-			type = retriever
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-			duration = Long.parseLong(retriever
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-		} else {
+//		if (file.exists()) {
+//			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+//			Uri uri = Uri.fromFile(file);
+//			retriever.setDataSource(context, uri);
+//			type = retriever
+//					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
+//			duration = Long.parseLong(retriever
+//					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+//		} else {
 			type = "";
 			duration = 0;
-		}
+//		}
 		long size = file.length();
 
 		return new AudioModel(file.getName(), type, size, duration, file.getAbsolutePath());
