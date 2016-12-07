@@ -16,6 +16,7 @@ import ru.fixapp.fooproject.di.modules.ImageLoaderModule;
 import ru.fixapp.fooproject.di.modules.NetworkModule;
 import ru.fixapp.fooproject.di.modules.ProvidersModule;
 import ru.fixapp.fooproject.di.modules.RepoModule;
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.domainlayer.providers.SchedulersProvider;
 import ru.fixapp.fooproject.domainlayer.providers.SessionDataProvider;
 import ru.fixapp.fooproject.presentationlayer.resolution.ImageLoader;
@@ -51,5 +52,7 @@ public interface AppComponent {
 
 	///
 	AudioRepo provideAudioRepo();
+
+	AudioSettings getAudioSettings();
 
 }

@@ -6,15 +6,17 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import ru.fixapp.fooproject.domainlayer.interactors.AudioRecorderInteractor;
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
 
 public class FileInfoConverter {
+	private final AudioSettings settings;
 	private Context context;
 
 	@Inject
-	public FileInfoConverter(Context context) {
+	public FileInfoConverter(Context context, AudioSettings settings) {
 		this.context = context;
+		this.settings = settings;
 	}
 
 	public static int calculateAudioLength(int samplesCount, int sampleRate, int channelCount) {
@@ -36,7 +38,7 @@ public class FileInfoConverter {
 //		} else {
 		long size = file.length();
 		type = "";
-		duration = calculateAudioLength((int) (size / 2), AudioRecorderInteractor.SAMPLING_RATE,1);
+		duration = calculateAudioLength((int) (size / settings.getBytePerSample()), settings.getSampleRate(),settings.getChannel());
 //		}
 
 		return new AudioModel(file.getName(), type, size, duration, file.getAbsolutePath());

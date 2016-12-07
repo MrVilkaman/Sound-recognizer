@@ -12,6 +12,7 @@ import ru.fixapp.fooproject.di.PerActivity;
 import ru.fixapp.fooproject.di.modules.activity.CommonActivityModule;
 import ru.fixapp.fooproject.di.modules.activity.DrawerModule;
 import ru.fixapp.fooproject.di.modules.activity.ToolbarModule;
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.domainlayer.providers.SchedulersProvider;
 import ru.fixapp.fooproject.presentationlayer.resolution.ImageLoader;
 import ru.fixapp.fooproject.presentationlayer.resolution.navigation.NavigationResolver;
@@ -48,5 +49,7 @@ public interface ActivityComponent {
 	Bus provideBus();
 
 	AudioRepo provideAudioRepo();
+
+	AudioSettings getAudioSettings();
 
 }

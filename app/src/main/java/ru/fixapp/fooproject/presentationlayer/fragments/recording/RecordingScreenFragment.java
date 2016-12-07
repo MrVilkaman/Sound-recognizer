@@ -30,6 +30,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnTouch;
 import ru.fixapp.fooproject.R;
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
 
@@ -121,30 +122,10 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 
 	@Override
 	public void setupVisualizerFxAndUI(int audioSessionId) {
-//		visualizerView.setEnabled(true);
-		// Create the Visualizer object and attach it to our media player.
-		mVisualizer = new Visualizer(audioSessionId);
-		mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-		mVisualizer.setDataCaptureListener(
-				new Visualizer.OnDataCaptureListener() {
-					@Override
-					public void onWaveFormDataCapture(Visualizer visualizer,
-													  byte[] bytes, int samplingRate) {
-//						visualizerView.updateVisualizer(bytes);
-					}
-
-					@Override
-					public void onFftDataCapture(Visualizer visualizer,
-												 byte[] bytes, int samplingRate) {
-					}
-				}, Visualizer.getMaxCaptureRate() / 2, true, false);
 	}
 
 	@Override
 	public void showViz() {
-//		visualizerView.setEnabled(false);
-
-
 	}
 
 	@Override
@@ -171,15 +152,26 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		}
 	}
 
+	@Inject AudioSettings audioSettings;
 	private void updateVisualizer(byte[] bytes) {
 
+
+
+
 		List<Entry> entries = new ArrayList<>();
-		for (int i = 0; i < bytes.length / 2; i++) {
-			int lB = bytes[i * 2] & 0xff;
-			int rB = bytes[i * 2 + 1] << 8;
-			short sample = (short) (lB | rB);
-			entries.add(new Entry(i, sample));
+		if (audioSettings.isPCM16BIT()) {
+			for (int i = 0; i < bytes.length / 2; i++) {
+				int lB = bytes[i * 2] & 0xff;
+				int rB = bytes[i * 2 + 1] << 8;
+				short sample = (short) (lB | rB);
+				entries.add(new Entry(i, sample));
+			}
+		}else {
+			for (int i = 0; i < bytes.length ; i++) {
+				entries.add(new Entry(i, bytes[i]));
+			}
 		}
+
 
 		LineDataSet dataSet = new LineDataSet(entries, "Label");
 		dataSet.setColor(Color.BLUE);

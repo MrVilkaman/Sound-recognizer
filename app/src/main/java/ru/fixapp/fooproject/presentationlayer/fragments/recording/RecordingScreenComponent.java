@@ -17,6 +17,7 @@ import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractorImpl;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioTrackPlayerInteractorImpl;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioTrackRecorderInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 
 @PerScreen
@@ -25,6 +26,7 @@ import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 public interface RecordingScreenComponent {
 
 	void inject(RecordingScreenFragment fragment);
+
 
 	@Module
 	class RecordingScreenModule {
@@ -37,14 +39,14 @@ public interface RecordingScreenComponent {
 
 		@Provides
 		@PerScreen
-		IAudioRecorderInteractor recorder(Bus bus) {
-			return new AudioTrackRecorderInteractor(bus);
+		IAudioRecorderInteractor recorder(Bus bus, AudioSettings settings) {
+			return new AudioTrackRecorderInteractor(bus, settings);
 		}
 
 		@PerScreen
 		@Provides
-		AudioPlayerInteractor provideAudioPlayer(Context context){
-			return new AudioTrackPlayerInteractorImpl(context);
+		AudioPlayerInteractor provideAudioPlayer(Context context,AudioSettings settings){
+			return new AudioTrackPlayerInteractorImpl(context,settings);
 		}
 
 		@PerScreen

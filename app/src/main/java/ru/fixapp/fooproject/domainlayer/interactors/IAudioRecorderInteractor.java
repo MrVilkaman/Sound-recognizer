@@ -4,8 +4,6 @@ import rx.Observable;
 
 public interface IAudioRecorderInteractor {
 
-    int SAMPLING_RATE = 44100;
-
     Observable<Void> start(String path);
 
     Observable<Void> stop();

@@ -29,7 +29,7 @@ public class AudioRecorderInteractor implements IAudioRecorderInteractor {
 			recorder.setOutputFile(path);
 			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC_ELD);
 			recorder.setAudioEncodingBitRate(64000);
-			recorder.setAudioSamplingRate(SAMPLING_RATE);
+			recorder.setAudioSamplingRate(44100);
 
 			try {
 				recorder.prepare();

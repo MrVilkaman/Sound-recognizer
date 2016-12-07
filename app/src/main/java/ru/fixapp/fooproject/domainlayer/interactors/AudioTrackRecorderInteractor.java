@@ -1,8 +1,6 @@
 package ru.fixapp.fooproject.domainlayer.interactors;
 
-import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -14,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.presentationlayer.models.AudioEvents;
 import ru.fixapp.fooproject.presentationlayer.models.QueriesBus;
 import rx.Observable;
@@ -25,23 +24,13 @@ import static android.media.AudioRecord.RECORDSTATE_RECORDING;
 public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 
 	private final Bus bus;
+	private final AudioSettings settings;
 
 	private AudioRecord record;
-	private int bufferSize;
 
-	public AudioTrackRecorderInteractor(Bus bus) {
+	public AudioTrackRecorderInteractor(Bus bus, AudioSettings settings) {
 		this.bus = bus;
-		init();
-	}
-
-	private void init() {
-		bufferSize = AudioRecord.getMinBufferSize(SAMPLING_RATE,
-				AudioFormat.CHANNEL_IN_MONO,
-				AudioFormat.ENCODING_PCM_16BIT);
-
-		if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE) {
-			bufferSize = SAMPLING_RATE * 2;
-		}
+		this.settings = settings;
 	}
 
 	@Override
@@ -56,13 +45,14 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 	@Nullable
 	private Void saveToFile(DataOutputStream stream, Container container) {
 		try {
-			short[] audioBuffer = container.audioBuffer;
-			Log.e("Audio", "start writeShort " + audioBuffer.length);
-			for (int i = 0; i < audioBuffer.length; i++) {
-				stream.writeShort(audioBuffer[i]); //Save each number
+			if (settings.isPCM16BIT()) {
+				short[] audioBuffer = container.audioBuffer;
+				for (int i = 0; i < audioBuffer.length; i++) {
+					stream.writeShort(audioBuffer[i]); //Save each number
+				}
+			} else {
+				stream.write(container.audioBufferByte);
 			}
-			Log.e("Audio", "End writeShort " + audioBuffer.length);
-
 		} catch (IOException e) {
 			Log.e("Audio", "File write failed: " + e.toString());
 		}
@@ -78,11 +68,11 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 	private Observable<Container> getAudioRecordObservable() {
 		return Observable.fromCallable(() -> {
 
-			record = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION,
-					SAMPLING_RATE,
-					AudioFormat.CHANNEL_IN_MONO,
-					AudioFormat.ENCODING_PCM_16BIT,
-					bufferSize);
+			record = new AudioRecord(settings.getAudioSoureForRecord(),
+					settings.getSampleRate(),
+					settings.getChannel(),
+					settings.getEncoding(),
+					settings.getBufferSize());
 
 			record.startRecording();
 			return null;
@@ -92,12 +82,22 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 					@Override
 					public Observable<Container> call(Object o) {
 						return Observable.create(subscriber -> {
-							short[] audioBuffer = new short[bufferSize / 2];
-							while (record.getRecordingState() == RECORDSTATE_RECORDING) {
-								int numberOfShort = record.read(audioBuffer, 0, audioBuffer
-										.length);
-								subscriber.onNext(new Container(audioBuffer));
+							if (settings.isPCM16BIT()) {
+								short[] audioBuffer = new short[settings.getBufferSize() / 2];
+								while (record.getRecordingState() == RECORDSTATE_RECORDING) {
+									int numberOfShort = record.read(audioBuffer, 0, audioBuffer
+											.length);
+									subscriber.onNext(new Container(audioBuffer));
+								}
+							} else {
+								byte[] audioBuffer = new byte[settings.getBufferSize()];
+								while (record.getRecordingState() == RECORDSTATE_RECORDING) {
+									int numberOfShort = record.read(audioBuffer, 0, audioBuffer
+											.length);
+									subscriber.onNext(new Container(audioBuffer));
+								}
 							}
+
 							if (!subscriber.isUnsubscribed())
 								subscriber.onCompleted();
 						});
@@ -121,10 +121,17 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 	}
 
 	private static class Container {
+		private final byte[] audioBufferByte;
 		private final short[] audioBuffer;
 
 		public Container(short[] audioBuffer) {
 			this.audioBuffer = audioBuffer;
+			audioBufferByte = null;
+		}
+
+		public Container(byte[] audioBufferByte) {
+			this.audioBufferByte = audioBufferByte;
+			audioBuffer = null;
 		}
 	}
 }

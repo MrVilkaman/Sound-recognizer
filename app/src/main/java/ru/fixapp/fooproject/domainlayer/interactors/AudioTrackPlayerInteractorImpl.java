@@ -10,28 +10,19 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileInputStream;
 
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 	private final Context context;
+	private final AudioSettings settings;
 	private AudioTrack audioTrack;
-	private int bufferSize;
 
-	public AudioTrackPlayerInteractorImpl(Context context) {
+	public AudioTrackPlayerInteractorImpl(Context context, AudioSettings settings) {
 		this.context = context;
-		init();
-	}
-
-	private void init() {
-		bufferSize = AudioTrack.getMinBufferSize(
-				IAudioRecorderInteractor.SAMPLING_RATE, AudioFormat.CHANNEL_OUT_MONO,
-				AudioFormat.ENCODING_PCM_16BIT);
-		if (bufferSize == AudioTrack.ERROR || bufferSize == AudioTrack.ERROR_BAD_VALUE) {
-			bufferSize = IAudioRecorderInteractor.SAMPLING_RATE * 2;
-		}
-
+		this.settings = settings;
 	}
 
 	@Override
@@ -39,7 +30,7 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 
 		return Observable.combineLatest(getObjectObservable(), getFileStreamObservable(pathToFile),
 				(o, container) -> container)
-				.observeOn(Schedulers.newThread())
+//				.observeOn(Schedulers.newThread())
 				.map(container -> {
 
 					Log.d("Audio","audioTrack write thread"+Thread.currentThread().getName());
@@ -55,10 +46,10 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 
 			audioTrack = new AudioTrack(
 					AudioManager.STREAM_MUSIC,
-					IAudioRecorderInteractor.SAMPLING_RATE,
+					settings.getSampleRate(),
 					AudioFormat.CHANNEL_OUT_MONO,
-					AudioFormat.ENCODING_PCM_16BIT,
-					bufferSize,
+					settings.getEncoding(),
+					settings.getBufferSize(),
 					AudioTrack.MODE_STREAM);
 			audioTrack.play();
 			return null;
@@ -74,9 +65,11 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 					@Override
 					public Observable<Container> call(FileInputStream is) {
 						return Observable.create(subscriber -> {
-							short[] audioBuffer = new short[bufferSize / 2];
 							try {
-								byte[] b = new byte[bufferSize];
+								int sampleRate = settings.getSampleRate();
+								int i1 = sampleRate / 2;
+								byte[] b = new byte[i1*2];
+							short[] audioBuffer = new short[i1];
 								int bytesRead;
 								while ((bytesRead = is.read(b)) != -1) {
 
@@ -97,8 +90,8 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 								subscriber.onCompleted();
 						});
 					}
-				})
-				.onBackpressureBuffer();
+				});
+//				.onBackpressureBuffer();
 	}
 
 	@Override
