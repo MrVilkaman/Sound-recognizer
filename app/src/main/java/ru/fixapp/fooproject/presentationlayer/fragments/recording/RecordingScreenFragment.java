@@ -16,7 +16,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.io.ByteArrayOutputStream;
@@ -175,8 +174,11 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	private void updateVisualizer(byte[] bytes) {
 
 		List<Entry> entries = new ArrayList<>();
-		for (int i = 0; i < bytes.length; i++) {
-			entries.add(new Entry(i, bytes[i]));
+		for (int i = 0; i < bytes.length; i+=2) {
+			int lB = bytes[i] & 0xff;
+			int rB = bytes[i + 1] << 8;
+			short sample = (short) (lB | rB);
+			entries.add(new Entry(i, sample));
 		}
 
 		LineDataSet dataSet = new LineDataSet(entries, "Label");
@@ -202,15 +204,16 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
 			@Override
 			public void onValueSelected(Entry e, Highlight h) {
-				List<ILineDataSet> dataSets = lineChart.getLineData().getDataSets();
-				float x = e.getX();
-				ILineDataSet iLineDataSet = dataSets.get(0);
-				Entry entryForXPos = iLineDataSet.getEntryForIndex((int) x);
-				uiResolver.showToast(R.string.simple_text,entryForXPos.getX());
-
-				float v = 1000f *  iLineDataSet.getXMax() / cache.getDuraction();
-				float offset = entryForXPos.getX() / v;
-				getPresenter().setNextTimePoint(offset);
+				//// TODO: 07.12.16 !
+//				List<ILineDataSet> dataSets = lineChart.getLineData().getDataSets();
+//				float x = e.getX();
+//				ILineDataSet iLineDataSet = dataSets.get(0);
+//				Entry entryForXPos = iLineDataSet.getEntryForIndex((int) x);
+//				uiResolver.showToast(R.string.simple_text,entryForXPos.getX());
+//
+//				float v = 1000f *  iLineDataSet.getXMax() / cache.getDuraction();
+//				float offset = entryForXPos.getX() / v;
+//				getPresenter().setNextTimePoint(offset);
 			}
 
 			@Override

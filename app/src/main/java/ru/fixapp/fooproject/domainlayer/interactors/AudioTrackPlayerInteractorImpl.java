@@ -82,8 +82,8 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 										int lB = contents[i] & 0xff;
 										int rB = contents[i + 1] << 8;
 										audioBuffer[i] = (short) (lB |rB);
-										subscriber.onNext(new Container(audioBuffer));
 									}
+									subscriber.onNext(new Container(audioBuffer));
 
 								}
 							} catch (Exception e) {
