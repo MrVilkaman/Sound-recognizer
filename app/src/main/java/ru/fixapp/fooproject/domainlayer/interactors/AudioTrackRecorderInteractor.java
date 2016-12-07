@@ -83,7 +83,6 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 					AudioFormat.CHANNEL_IN_MONO,
 					AudioFormat.ENCODING_PCM_16BIT,
 					bufferSize);
-			Log.d("Audio", "state init" + record.getState());
 
 			record.startRecording();
 			return null;
@@ -112,7 +111,6 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 	public Observable<Void> stop() {
 		return Observable.fromCallable(() -> {
 			if (record != null) {
-				Log.d("Audio", "stop ");
 				record.stop();
 				record.release();
 				bus.publish(QueriesBus.AUDIO_EVENTS_QUEUE, AudioEvents.RECORDED);

@@ -158,8 +158,8 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 
 		try {
 			InputStream is = new FileInputStream(absolutePath);
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			byte[] b = new byte[2048];
+			byte[] b = new byte[8192];
+			ByteArrayOutputStream bos = new ByteArrayOutputStream(65536);
 			while ((bytesRead = is.read(b)) != -1) {
 				bos.write(b, 0, bytesRead);
 			}
@@ -174,9 +174,9 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	private void updateVisualizer(byte[] bytes) {
 
 		List<Entry> entries = new ArrayList<>();
-		for (int i = 0; i < bytes.length; i+=2) {
-			int lB = bytes[i] & 0xff;
-			int rB = bytes[i + 1] << 8;
+		for (int i = 0; i < bytes.length / 2; i++) {
+			int lB = bytes[i * 2] & 0xff;
+			int rB = bytes[i * 2 + 1] << 8;
 			short sample = (short) (lB | rB);
 			entries.add(new Entry(i, sample));
 		}
@@ -188,18 +188,20 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		dataSet.setDrawCircleHole(false);
 		dataSet.setDrawHorizontalHighlightIndicator(false);
 
-		lineChart.getLegend().setEnabled(false);
+		lineChart.getLegend()
+				.setEnabled(false);
 		Description desc = new Description();
 		desc.setText("");
 		lineChart.setDescription(desc);
 		lineChart.setDrawGridBackground(false);
 
 
-		lineChart.getXAxis().setValueFormatter((value, axis) -> {
-			float v = 1000f *  axis.mAxisMaximum / cache.getDuraction();
+		lineChart.getXAxis()
+				.setValueFormatter((value, axis) -> {
+					float v = 1000f * axis.mAxisMaximum / cache.getDuraction();
 
-			return String.format("%.2f",value/v);
-		});
+					return String.format("%.2f", value / v);
+				});
 
 		lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
 			@Override
@@ -221,9 +223,9 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 			}
 		});
 
-		Highlight h1 = new Highlight(0,0,1);
-		Highlight h2 = new Highlight(0,0,2);
-		lineChart.highlightValues(new Highlight[] {h1, h2});
+		Highlight h1 = new Highlight(0, 0, 1);
+		Highlight h2 = new Highlight(0, 0, 2);
+		lineChart.highlightValues(new Highlight[]{h1, h2});
 
 
 		LineData lineData = new LineData(dataSet);
