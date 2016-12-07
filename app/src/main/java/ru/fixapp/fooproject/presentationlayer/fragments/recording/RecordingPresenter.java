@@ -10,7 +10,6 @@ import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
 import ru.fixapp.fooproject.presentationlayer.formaters.RecordsFormat;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
-import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
 
 public class RecordingPresenter extends BasePresenter<RecordingView> {
 
@@ -46,16 +45,16 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 
 	private void updateInfo() {
 		if (cache.hasPath()) {
-			subscribeUI(storageInteractor.getAudioInfo(cache.getPath()),
-					new ViewSubscriber<RecordingView, AudioModel>(view()) {
-						@Override
-						public void onNext(AudioModel model) {
-							cache.setDuraction(model.getDuration());
-							view().showAudioInfo(recordsFormat.format(model));
-							view().showBytes(model.getAbsolutePath());
-							update();
-						}
-					});
+//			subscribeUI(storageInteractor.getAudioInfo(cache.getPath()),
+//					new ViewSubscriber<RecordingView, AudioModel>(view()) {
+//						@Override
+//						public void onNext(AudioModel model) {
+//							cache.setDuraction(model.getDuration());
+//							view().showAudioInfo(recordsFormat.format(model));
+//							view().showBytes(model.getAbsolutePath());
+//							update();
+//						}
+//					});
 		}
 	}
 

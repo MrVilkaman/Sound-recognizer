@@ -16,6 +16,7 @@ import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractorImpl;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioRecorderInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractorImpl;
+import ru.fixapp.fooproject.domainlayer.interactors.AudioTrackRecorderInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 
@@ -38,7 +39,7 @@ public interface RecordingScreenComponent {
 		@Provides
 		@PerScreen
 		IAudioRecorderInteractor recorder(Bus bus) {
-			return new AudioRecorderInteractor(bus);
+			return new AudioTrackRecorderInteractor(bus);
 		}
 
 		@PerScreen

@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -166,8 +165,8 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 				bos.write(b, 0, bytesRead);
 			}
 			byte[] bytes = bos.toByteArray();
-			byte[] bytes1 = Arrays.copyOfRange(bytes, 3930, bytes.length);
-			updateVisualizer(bytes1);
+//			byte[] bytes1 = Arrays.copyOfRange(bytes, 3930, bytes.length);
+			updateVisualizer(bytes);
 		} catch (Exception e) {
 			handleError(e);
 		}
