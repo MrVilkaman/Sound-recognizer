@@ -38,7 +38,7 @@ public class FileInfoConverter {
 //		} else {
 		long size = file.length();
 		type = "";
-		duration = calculateAudioLength((int) (size / settings.getBytePerSample()), settings.getSampleRate(),settings.getChannel());
+		duration = calculateAudioLength((int) (size / settings.getBytePerSample()), settings.getSampleRate(),1);
 //		}
 
 		return new AudioModel(file.getName(), type, size, duration, file.getAbsolutePath());

@@ -2,7 +2,6 @@ package ru.fixapp.fooproject.presentationlayer.fragments.recording;
 
 
 import android.graphics.Color;
-import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -45,8 +44,6 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@BindView(R.id.recording_audio_info_2) TextView textView2;
 	@BindView(R.id.recording_record) View recordButton;
 	@BindView(R.id.recording_audio_visualizerview) LineChart lineChart;
-
-	private Visualizer mVisualizer;
 
 	public static RecordingScreenFragment create() {
 		return new RecordingScreenFragment();
