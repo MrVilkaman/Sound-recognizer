@@ -5,14 +5,14 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import rx.Observable;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
@@ -33,9 +33,27 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 //				.observeOn(Schedulers.newThread())
 				.map(container -> {
 
-					Log.d("Audio","audioTrack write thread"+Thread.currentThread().getName());
-					return audioTrack.write(container.audioBuffer, 0,
-							container.audioBuffer.length);
+					short[] buffer = new short[settings.getBufferSize()];
+					container.rewind();
+					int limit = container.limit();
+					int totalWritten = 0;
+					while (container.position() < limit ) {
+						int numSamplesLeft = limit - container.position();
+						int samplesToWrite;
+						if (numSamplesLeft >= buffer.length) {
+							container.get(buffer);
+							samplesToWrite = buffer.length;
+						} else {
+							for (int i = numSamplesLeft; i < buffer.length; i++) {
+								buffer[i] = 0;
+							}
+							container.get(buffer, 0, numSamplesLeft);
+							samplesToWrite = numSamplesLeft;
+						}
+						totalWritten += samplesToWrite;
+						audioTrack.write(buffer, 0, samplesToWrite);
+					}
+					return 0;
 				})
 				.ignoreElements();
 	}
@@ -57,53 +75,30 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 	}
 
 
-	private Observable<Container> getFileStreamObservable(String path) {
+	private Observable<ShortBuffer> getFileStreamObservable(String path) {
 		return Observable.fromCallable(
 				() -> new FileInputStream(new File(path)))
 				.subscribeOn(Schedulers.io())
-				.concatMap(new Func1<FileInputStream, Observable<Container>>() {
-					@Override
-					public Observable<Container> call(FileInputStream is) {
-						return Observable.create(subscriber -> {
-							try {
-								int sampleRate = settings.getSampleRate();
-								int i1 = sampleRate / 2;
-								byte[] b = new byte[i1*2];
-							short[] audioBuffer = new short[i1];
-								int bytesRead;
-								while ((bytesRead = is.read(b)) != -1) {
-
-									for (int i = 0; i < bytesRead/ 2; i++) {
-										int lB = b[i * 2] & 0xff;
-										int rB = b[i * 2 + 1] << 8;
-										audioBuffer[i] = (short) (lB | rB);
-									}
-									subscriber.onNext(new Container(audioBuffer));
-								}
-//								byte[] bytes = bos.toByteArray();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-
-
-							if (!subscriber.isUnsubscribed())
-								subscriber.onCompleted();
-						});
+				.map(is -> {
+					try {
+						ByteBuffer allocate = ByteBuffer.allocate(is.available());
+						byte[] b = new byte[65536];
+						int bytesRead;
+						while ((bytesRead = is.read(b)) != -1) {
+							allocate = allocate.put(b,0,bytesRead);
+						}
+						allocate.position(0);
+						return allocate.asShortBuffer();
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+					return null;
 				});
-//				.onBackpressureBuffer();
+
 	}
 
 	@Override
 	public void stop() {
 
-	}
-
-	private class Container {
-		private final short[] audioBuffer;
-
-		public Container(short[] audioBuffer) {
-			this.audioBuffer = audioBuffer;
-		}
 	}
 }
