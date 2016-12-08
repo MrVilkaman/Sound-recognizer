@@ -42,7 +42,7 @@ public class AppModule {
 	@Singleton
 	@Provides
 	public AudioSettings getAudioSettings(){
-		return new AudioSettings(11025, AudioFormat.ENCODING_PCM_16BIT,
+		return new AudioSettings(22050, AudioFormat.ENCODING_PCM_16BIT,
 				AudioFormat.CHANNEL_IN_MONO);
 	}
 }

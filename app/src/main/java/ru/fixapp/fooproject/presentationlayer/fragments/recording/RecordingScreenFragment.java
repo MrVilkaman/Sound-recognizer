@@ -201,9 +201,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 				float x = e.getX();
 				ILineDataSet iLineDataSet = dataSets.get(0);
 				Entry entryForXPos = iLineDataSet.getEntryForIndex((int) x);
-				uiResolver.showToast(R.string.simple_text,entryForXPos.getX());
 
-				float v = 1000f *  iLineDataSet.getXMax() / cache.getDuraction();
 				getPresenter().setNextTimePoint((long)entryForXPos.getX());
 			}
 

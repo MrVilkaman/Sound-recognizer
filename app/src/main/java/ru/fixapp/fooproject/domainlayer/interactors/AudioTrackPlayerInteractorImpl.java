@@ -32,7 +32,6 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 				(o, container) -> container)
 //				.observeOn(Schedulers.newThread())
 				.map(container -> {
-
 					short[] buffer = new short[settings.getBufferSize()];
 					container.rewind();
 					container.position((int) (long)offsetStart);
@@ -55,6 +54,10 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 						totalWritten += samplesToWrite;
 						audioTrack.write(buffer, 0, samplesToWrite);
 					}
+					return 0;
+				})
+				.map(q ->{
+					audioTrack.stop();
 					return 0;
 				})
 				.ignoreElements();
