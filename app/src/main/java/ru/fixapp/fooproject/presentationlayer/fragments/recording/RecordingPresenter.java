@@ -51,6 +51,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 						@Override
 						public void onNext(AudioModel model) {
 							cache.setDuraction(model.getDuration());
+							cache.setSampleCount(model.getSampleCount());
 							view().showAudioInfo(recordsFormat.format(model));
 							view().showBytes(model.getAbsolutePath());
 							update();
@@ -58,7 +59,6 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 					});
 		}
 	}
-
 
 	public void startRecording() {
 		subscribe(audioRecorder.start(cache.getPath()), new ErrorSubscriber<>(view()));
@@ -90,16 +90,16 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 				});
 	}
 
-	public void setNextTimePoint(float offset) {
+	public void setNextTimePoint(long offset) {
 		boolean startNow = cache.isStartNow();
 		if (startNow) {
-			float max = Math.max(cache.getEnd(), offset);
-			float min = Math.min(cache.getEnd(), offset);
+			long max = Math.max(cache.getEnd(), offset);
+			long min = Math.min(cache.getEnd(), offset);
 			cache.setStart(min);
 			cache.setEnd(max);
 		} else {
-			float max = Math.max(cache.getStart(), offset);
-			float min = Math.min(cache.getStart(), offset);
+			long max = Math.max(cache.getStart(), offset);
+			long min = Math.min(cache.getStart(), offset);
 			cache.setStart(min);
 			cache.setEnd(max);
 		}
@@ -108,6 +108,6 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	private void update() {
-		view().setRangeTime(recordsFormat.formatOffset(cache.getStart(), cache.getEnd()));
+		view().setRangeTime(recordsFormat.formatOffset(cache.getStart(), cache.getEnd(),cache.getSampleCount(),cache.getDuraction()));
 	}
 }

@@ -25,7 +25,9 @@ public class RecordsFormat {
 		return name + '\n' + type + '\n' + format + '\n' + format2;
 	}
 
-	public String formatOffset(float start, float end) {
-		return String.format("%1.2f - %2.2f",start,end);
+	public String formatOffset(float start, float end, long sampleCount, long duraction) {
+		float startD = duraction * start / sampleCount/ 1000;
+		float endD = duraction * end / sampleCount/ 1000;
+		return String.format("%1.2f - %2.2f",startD,endD);
 	}
 }

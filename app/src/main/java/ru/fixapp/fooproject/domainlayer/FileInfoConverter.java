@@ -19,8 +19,8 @@ public class FileInfoConverter {
 		this.settings = settings;
 	}
 
-	public static int calculateAudioLength(int samplesCount, int sampleRate, int channelCount) {
-		return ((samplesCount / channelCount) * 1000) / sampleRate;
+	public static int calculateAudioLength(long samplesCount, int sampleRate, int channelCount) {
+		return (int) (((samplesCount / channelCount) * 1000) / sampleRate);
 	}
 
 	public AudioModel convert(File file) {
@@ -38,10 +38,11 @@ public class FileInfoConverter {
 //		} else {
 		long size = file.length();
 		type = "";
-		duration = calculateAudioLength((int) (size / settings.getBytePerSample()), settings.getSampleRate(),1);
+		long sampleCount = size / settings.getBytePerSample();
+		duration = calculateAudioLength(sampleCount, settings.getSampleRate(),1);
 //		}
 
-		return new AudioModel(file.getName(), type, size, duration, file.getAbsolutePath());
+		return new AudioModel(file.getName(), type, size, duration, file.getAbsolutePath(),sampleCount);
 	}
 
 }

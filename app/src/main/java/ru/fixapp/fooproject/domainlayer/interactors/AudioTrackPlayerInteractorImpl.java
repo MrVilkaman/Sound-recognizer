@@ -35,7 +35,9 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 
 					short[] buffer = new short[settings.getBufferSize()];
 					container.rewind();
-					int limit = container.limit();
+					container.position((int) (long)offsetStart);
+					int limit = (int) (long) offsetEnd;
+					limit = Math.min(limit,container.limit());
 					int totalWritten = 0;
 					while (container.position() < limit ) {
 						int numSamplesLeft = limit - container.position();
