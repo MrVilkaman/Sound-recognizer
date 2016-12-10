@@ -66,6 +66,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
+		getToolbar().hide();
 		// dirty hack!! need more flexible way!
 		cache.restoreState(savedInstanceState);
 		Bundle arguments = getArguments();

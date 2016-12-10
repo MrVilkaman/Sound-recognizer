@@ -34,6 +34,8 @@ public class RecordListScreenFragment extends BaseFragment<RecordListPresenter> 
 
 	@Override
 	protected void onCreateView(View view, Bundle savedInstanceState) {
+		getToolbar().show();
+
 		recyclerView.setAdapter(adapter);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 		adapter.setOnClick(category -> getPresenter().openRecordDetail(category.getAbsolutePath()));

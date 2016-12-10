@@ -79,7 +79,6 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 		});
 	}
 
-
 	private Observable<ShortBuffer> getFileStreamObservable(String path) {
 		return Observable.fromCallable(
 				() -> new FileInputStream(new File(path)))

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
 	<TextView
+		android:layout_alignParentBottom="true"
 		android:id="@+id/recording_audio_info"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -19,7 +20,8 @@
 		android:id="@+id/recording_audio_info_2"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_gravity="right|bottom"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"
 		android:layout_margin="16dp"
 		android:gravity="center"
 		tools:text="asdasdasdasdasdsa"/>
@@ -28,15 +30,18 @@
 	<com.github.mikephil.charting.charts.LineChart
 		android:id="@+id/recording_audio_visualizerview"
 		android:layout_width="match_parent"
-		android:layout_height="160dp"
-		android:layout_marginTop="8dp"/>
+		android:layout_height="match_parent"
+		android:layout_marginTop="8dp"
+		android:layout_marginBottom="8dp"
+		android:layout_alignParentTop="true"/>
 
 
 	<LinearLayout
 		style="@style/LL.H"
-		android:layout_gravity="bottom"
+		android:layout_alignParentBottom="true"
 		android:layout_marginBottom="8dp"
-		android:gravity="center_horizontal">
+		android:gravity="center_horizontal"
+		android:id="@+id/linearLayout">
 
 		<Button
 			android:id="@+id/recording_play"
@@ -53,4 +58,4 @@
 			android:text="Записать"/>
 	</LinearLayout>
 
-</FrameLayout>
+</RelativeLayout>
