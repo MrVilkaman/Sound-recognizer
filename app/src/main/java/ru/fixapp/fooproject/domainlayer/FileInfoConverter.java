@@ -25,7 +25,7 @@ public class FileInfoConverter {
 
 	public AudioModel convert(File file) {
 
-		String type;
+
 		long duration;
 //		if (file.exists()) {
 //			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -37,12 +37,13 @@ public class FileInfoConverter {
 //					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 //		} else {
 		long size = file.length();
-		type = "";
 		long sampleCount = size / settings.getBytePerSample();
 		duration = calculateAudioLength(sampleCount, settings.getSampleRate(),1);
+
 //		}
 
-		return new AudioModel(file.getName(), type, size, duration, file.getAbsolutePath(),sampleCount);
+		return new AudioModel("format", "", size, duration, file.getAbsolutePath(),sampleCount,
+				file.lastModified());
 	}
 
 }

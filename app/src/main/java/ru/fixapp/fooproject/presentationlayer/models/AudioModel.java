@@ -7,16 +7,20 @@ public class AudioModel {
 	private final long duration;
 	private final long sampleCount;
 	private String absolutePath;
+	private long lastModified;
 
 	public AudioModel(String name, String type, long size, long duration, String absolutePath,
-					  long sampleCount) {
+					  long sampleCount, long lastModified) {
 		this.name = name;
 		this.type = type;
 		this.size = size;
 		this.duration = duration;
 		this.absolutePath = absolutePath;
 		this.sampleCount = sampleCount;
+		this.lastModified = lastModified;
 	}
+
+
 
 	public long getSampleCount() {
 		return sampleCount;
@@ -50,5 +54,9 @@ public class AudioModel {
 
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	public long lastModified() {
+		return lastModified;
 	}
 }
