@@ -18,10 +18,6 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,7 +26,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnTouch;
 import ru.fixapp.fooproject.R;
-import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
 
@@ -102,6 +97,11 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		getPresenter().playLastAudio();
 	}
 
+	@OnClick(R.id.recording_cut)
+	void onClickCut() {
+		getPresenter().cutAudio();
+	}
+
 	@OnTouch(R.id.recording_record)
 	boolean onTouchRecord(View view, MotionEvent event) {
 		switch (event.getAction()) {
@@ -120,57 +120,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	}
 
 	@Override
-	public void setupVisualizerFxAndUI(int audioSessionId) {
-	}
-
-	@Override
-	public void showViz() {
-	}
-
-	@Override
-	public void showBytes(String absolutePath) {
-
-		if (absolutePath == null || absolutePath.isEmpty()) {
-			return;
-		}
-
-		int bytesRead;
-
-		try {
-			InputStream is = new FileInputStream(absolutePath);
-			byte[] b = new byte[8192];
-			ByteArrayOutputStream bos = new ByteArrayOutputStream(65536);
-			while ((bytesRead = is.read(b)) != -1) {
-				bos.write(b, 0, bytesRead);
-			}
-			byte[] bytes = bos.toByteArray();
-//			byte[] bytes1 = Arrays.copyOfRange(bytes, 3930, bytes.length);
-			updateVisualizer(bytes);
-		} catch (Exception e) {
-			handleError(e);
-		}
-	}
-
-	@Inject AudioSettings audioSettings;
-	private void updateVisualizer(byte[] bytes) {
-
-
-
-
-		List<Entry> entries = new ArrayList<>();
-		if (audioSettings.isPCM16BIT()) {
-			for (int i = 0; i < bytes.length / 2; i++) {
-				int lB = bytes[i * 2] & 0xff;
-				int rB = bytes[i * 2 + 1] << 8;
-				short sample = (short) (lB | rB);
-				entries.add(new Entry(i, sample));
-			}
-		}else {
-			for (int i = 0; i < bytes.length ; i++) {
-				entries.add(new Entry(i, bytes[i]));
-			}
-		}
-
+	public void updateVisualizer(List<Entry> entries) {
 
 		LineDataSet dataSet = new LineDataSet(entries, "Label");
 		dataSet.setColor(Color.BLUE);

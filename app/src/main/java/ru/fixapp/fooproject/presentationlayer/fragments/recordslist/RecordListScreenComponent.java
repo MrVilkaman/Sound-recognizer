@@ -8,6 +8,7 @@ import ru.fixapp.fooproject.di.PerScreen;
 import ru.fixapp.fooproject.domainlayer.FileInfoConverter;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractorImpl;
+import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 
 @PerScreen
@@ -21,8 +22,9 @@ public interface RecordListScreenComponent {
 
 		@PerScreen
 		@Provides AudioStorageInteractor provideAudioStorageInteractor(AudioRepo recordDP,
-																	   FileInfoConverter fileInfoConverter){
-			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter);
+																	   FileInfoConverter fileInfoConverter,
+																	   AudioSettings audioSettings){
+			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter, audioSettings);
 		}
 	}
 }

@@ -6,10 +6,10 @@
 	android:layout_height="match_parent">
 
 	<TextView
-		android:layout_alignParentBottom="true"
 		android:id="@+id/recording_audio_info"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
 		android:layout_gravity="left|bottom"
 		android:layout_margin="8dp"
 		android:gravity="left"
@@ -31,17 +31,24 @@
 		android:id="@+id/recording_audio_visualizerview"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_marginTop="8dp"
+		android:layout_alignParentTop="true"
 		android:layout_marginBottom="8dp"
-		android:layout_alignParentTop="true"/>
+		android:layout_marginTop="8dp"/>
 
 
 	<LinearLayout
+		android:id="@+id/linearLayout"
 		style="@style/LL.H"
 		android:layout_alignParentBottom="true"
 		android:layout_marginBottom="8dp"
-		android:gravity="center_horizontal"
-		android:id="@+id/linearLayout">
+		android:gravity="center_horizontal">
+
+		<Button
+			android:id="@+id/recording_cut"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:text="Обрезать"/>
 
 		<Button
 			android:id="@+id/recording_play"
@@ -56,6 +63,7 @@
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
 			android:text="Записать"/>
+
 	</LinearLayout>
 
 </RelativeLayout>

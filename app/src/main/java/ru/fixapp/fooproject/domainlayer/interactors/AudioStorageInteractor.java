@@ -1,6 +1,8 @@
 package ru.fixapp.fooproject.domainlayer.interactors;
 
 
+import com.github.mikephil.charting.data.Entry;
+
 import java.util.List;
 
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
@@ -15,4 +17,6 @@ public interface AudioStorageInteractor {
 	String getNewPathForAudio();
 
 	void deleteFileByPath(AudioModel path);
+
+	Observable<List<Entry>> getGraphInfo(String path);
 }

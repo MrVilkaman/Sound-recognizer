@@ -33,8 +33,9 @@ public interface RecordingScreenComponent {
 
 		@PerScreen
 		@Provides AudioStorageInteractor provideAudioStorageInteractor(AudioRepo recordDP,
-																	   FileInfoConverter fileInfoConverter){
-			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter);
+																	   FileInfoConverter fileInfoConverter,
+																	   AudioSettings audioSettings){
+			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter, audioSettings);
 		}
 
 		@Provides
