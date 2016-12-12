@@ -98,8 +98,14 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void cutAudio() {
-		Observable<Void> graphObs = storageInteractor.cutAudio(cache.getPath(),cache.getStart(), cache.getEnd());
-		subscribeUI(graphObs, new ViewSubscriber<RecordingView, Void>(view()) {
+		Observable<String> graphObs = storageInteractor.cutAudio(cache.getPath(),cache.getStart(), cache.getEnd());
+		subscribeUI(graphObs, new ViewSubscriber<RecordingView, String>(view()) {
+			@Override
+			public void onNext(String path) {
+				super.onNext(path);
+				cache.setCurrentPath(path);
+			}
+
 			@Override
 			public void onCompleted() {
 				updateInfo();
@@ -136,7 +142,6 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 			cache.setDuraction(model.getDuration());
 			cache.setSampleCount(model.getSampleCount());
 			view().showAudioInfo(recordsFormat.format(model));
-//			view().showBytes(cache.getPath());
 			update();
 		}
 	}

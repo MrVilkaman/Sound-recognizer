@@ -20,5 +20,5 @@ public interface AudioStorageInteractor {
 
 	Observable<List<Entry>> getGraphInfo(String path);
 
-	Observable<Void> cutAudio(String path, long start, long end);
+	Observable<String> cutAudio(String path, long start, long end);
 }

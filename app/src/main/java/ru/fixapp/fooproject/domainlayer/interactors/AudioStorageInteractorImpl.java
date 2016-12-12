@@ -83,9 +83,9 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 	}
 
 	@Override
-	public Observable<Void> cutAudio(String path, long start, long end) {
+	public Observable<String> cutAudio(String path, long start, long end) {
 
-		Observable<String> temp = recordDP.getNextPathForAudio();
+		Observable<String> temp = recordDP.getNextPathForAudio().cache();
 
 		Observable<Container> map = recordDP.getFileStreamObservable(path)
 				.map(shortBuffer -> {
@@ -108,7 +108,7 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 				throw Exceptions.propagate(e);
 			}
 			return null;
-		});
+		}).concatMap(o -> temp);
 
 
 	}

@@ -81,6 +81,7 @@ public class RecordingPresenterCache {
 	}
 
 	public void setSampleCount(long sampleCount) {
+		setStart(0);
 		setEnd(sampleCount);
 		this.sampleCount = sampleCount;
 	}
