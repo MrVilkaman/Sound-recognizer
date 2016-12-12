@@ -6,29 +6,25 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.support.annotation.NonNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
-
+import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 
 public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
-	private final Context context;
 	private final AudioSettings settings;
+	private final AudioRepo audioRepo;
 	private AudioTrack audioTrack;
 
-	public AudioTrackPlayerInteractorImpl(Context context, AudioSettings settings) {
-		this.context = context;
+	public AudioTrackPlayerInteractorImpl(Context context, AudioSettings settings,
+										  AudioRepo audioRepo) {
 		this.settings = settings;
+		this.audioRepo = audioRepo;
 	}
 
 	@Override
 	public Observable<Integer> play(String pathToFile, float offsetStart, float offsetEnd) {
 
-		return Observable.combineLatest(getObjectObservable(), getFileStreamObservable(pathToFile),
+		return Observable.combineLatest(getObjectObservable(), audioRepo.getFileStreamObservable(pathToFile),
 				(o, container) -> container)
 //				.observeOn(Schedulers.newThread())
 				.map(container -> {
@@ -77,28 +73,6 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 			audioTrack.play();
 			return null;
 		});
-	}
-
-	private Observable<ShortBuffer> getFileStreamObservable(String path) {
-		return Observable.fromCallable(
-				() -> new FileInputStream(new File(path)))
-				.subscribeOn(Schedulers.io())
-				.map(is -> {
-					try {
-						ByteBuffer allocate = ByteBuffer.allocate(is.available());
-						byte[] b = new byte[65536];
-						int bytesRead;
-						while ((bytesRead = is.read(b)) != -1) {
-							allocate = allocate.put(b,0,bytesRead);
-						}
-						allocate.position(0);
-						return allocate.asShortBuffer();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					return null;
-				});
-
 	}
 
 	@Override

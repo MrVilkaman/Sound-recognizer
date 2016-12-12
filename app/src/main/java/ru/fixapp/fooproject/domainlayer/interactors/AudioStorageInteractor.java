@@ -19,4 +19,6 @@ public interface AudioStorageInteractor {
 	void deleteFileByPath(AudioModel path);
 
 	Observable<List<Entry>> getGraphInfo(String path);
+
+	Observable<Void> cutAudio(String path, long start, long end);
 }

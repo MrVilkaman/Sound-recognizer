@@ -2,20 +2,19 @@ package ru.fixapp.fooproject.domainlayer.interactors;
 
 import android.media.AudioRecord;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import net.jokubasdargis.rxbus.Bus;
 
-import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
+import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
+import ru.fixapp.fooproject.domainlayer.models.Container;
 import ru.fixapp.fooproject.presentationlayer.models.AudioEvents;
 import ru.fixapp.fooproject.presentationlayer.models.QueriesBus;
 import rx.Observable;
+import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -25,18 +24,20 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 
 	private final Bus bus;
 	private final AudioSettings settings;
+	private final AudioRepo audioRepo;
 
 	private AudioRecord record;
 
-	public AudioTrackRecorderInteractor(Bus bus, AudioSettings settings) {
+	public AudioTrackRecorderInteractor(Bus bus, AudioSettings settings, AudioRepo audioRepo) {
 		this.bus = bus;
 		this.settings = settings;
+		this.audioRepo = audioRepo;
 	}
 
 	@Override
 	public Observable<Void> start(String path) {
 		return Observable.combineLatest(getAudioRecordObservable(),
-				getFileStreamObservable(path),
+				audioRepo.getDataStreamObservable(path),
 				(container, dataOutputStream) -> saveToFile(dataOutputStream, container))
 				.ignoreElements()
 				.map(r -> null);
@@ -46,24 +47,21 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 	private Void saveToFile(DataOutputStream stream, Container container) {
 		try {
 			if (settings.isPCM16BIT()) {
-				short[] audioBuffer = container.audioBuffer;
+				short[] audioBuffer = container.getAudioBuffer();
 				for (int i = 0; i < audioBuffer.length; i++) {
 					stream.writeShort(audioBuffer[i]); //Save each number
 				}
 			} else {
-				stream.write(container.audioBufferByte);
+				stream.write(container.getAudioBufferByte());
 			}
+//			stream.close();
 		} catch (IOException e) {
-			Log.e("Audio", "File write failed: " + e.toString());
+			throw Exceptions.propagate(e);
 		}
 		return null;
 	}
 
-	private Observable<DataOutputStream> getFileStreamObservable(String path) {
-		return Observable.fromCallable(() -> new DataOutputStream(
-				new BufferedOutputStream(new FileOutputStream(new File(path)))))
-				.subscribeOn(Schedulers.io());
-	}
+
 
 	private Observable<Container> getAudioRecordObservable() {
 		return Observable.fromCallable(() -> {
@@ -118,20 +116,5 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 			record = null;
 			return null;
 		});
-	}
-
-	private static class Container {
-		private final byte[] audioBufferByte;
-		private final short[] audioBuffer;
-
-		public Container(short[] audioBuffer) {
-			this.audioBuffer = audioBuffer;
-			audioBufferByte = null;
-		}
-
-		public Container(byte[] audioBufferByte) {
-			this.audioBufferByte = audioBufferByte;
-			audioBuffer = null;
-		}
 	}
 }

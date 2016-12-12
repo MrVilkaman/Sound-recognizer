@@ -27,6 +27,11 @@ public abstract class ViewSubscriber<V extends BaseView, T> extends rx.Subscribe
 	}
 
 	@Override
+	public void onNext(T t) {
+
+	}
+
+	@Override
 	public void onCompleted() {
 
 	}

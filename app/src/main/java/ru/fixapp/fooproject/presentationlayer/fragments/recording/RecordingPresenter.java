@@ -98,7 +98,13 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void cutAudio() {
-
+		Observable<Void> graphObs = storageInteractor.cutAudio(cache.getPath(),cache.getStart(), cache.getEnd());
+		subscribeUI(graphObs, new ViewSubscriber<RecordingView, Void>(view()) {
+			@Override
+			public void onCompleted() {
+				updateInfo();
+			}
+		});
 	}
 
 	private static class RecordingViewIntegerViewSubscriber

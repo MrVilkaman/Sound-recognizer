@@ -4,16 +4,16 @@ import android.support.annotation.NonNull;
 
 import com.github.mikephil.charting.data.Entry;
 
-import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.FileInfoConverter;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
+import ru.fixapp.fooproject.domainlayer.models.Container;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
 import rx.Observable;
 import rx.exceptions.Exceptions;
@@ -68,50 +68,43 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 
 	@Override
 	public Observable<List<Entry>> getGraphInfo(String path) {
-		return Observable.just(path)
-				.map(this::getFileInputStream)
-				.map(this::getByteArray)
-				.map(o -> {
-					byte[] bytes = o.toByteArray();
+		return recordDP.getFileStreamObservable(path)
+				.map(shortBuffer -> {
+					short[] shortBuff = new short[shortBuffer.limit()];
+					shortBuffer.get(shortBuff);
 					List<Entry> entries = new ArrayList<>();
 					if (audioSettings.isPCM16BIT()) {
-						for (int i = 0; i < bytes.length / 2; i++) {
-							int lB = bytes[i * 2] & 0xff;
-							int rB = bytes[i * 2 + 1] << 8;
-							short sample = (short) (lB | rB);
-							entries.add(new Entry(i, sample));
-						}
-					}else {
-						for (int i = 0; i < bytes.length ; i++) {
-							entries.add(new Entry(i, bytes[i]));
+						for (int i = 0; i < shortBuff.length; i++) {
+							entries.add(new Entry(i, shortBuff[i]));
 						}
 					}
 					return entries;
 				});
 	}
 
-	@NonNull
-	private ByteArrayOutputStream getByteArray(FileInputStream fileInputStream) {
-		int bytesRead;
-		byte[] b = new byte[8192];
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(65536);
-		try {
+	@Override
+	public Observable<Void> cutAudio(String path, long start, long end) {
+		Observable<Container> map = recordDP.getFileStreamObservable(path)
+				.map(shortBuffer -> {
+					short[] shortBuff = new short[(int) (end - start)];
+					shortBuffer.get(shortBuff, (int) start, (int) end);
+					return new Container(shortBuff);
+				});
+		Observable<DataOutputStream> dataStreamObservable = recordDP.getDataStreamObservable(path);
+		return Observable.zip(dataStreamObservable, map, (stream, container) -> {
 
-			while ((bytesRead = fileInputStream.read(b)) != -1) {
-				bos.write(b, 0, bytesRead);
+			try {
+				short[] shorts = container.getAudioBuffer();
+				for (int i = 0; i < shorts.length; i++) {
+					stream.writeShort(shorts[i]); //Save each number
+				}
+				stream.close();
+			} catch (IOException e) {
+				throw Exceptions.propagate(e);
 			}
-			return bos;
-		} catch (Exception e) {
-			throw Exceptions.propagate(e);
-		}
-	}
+			return null;
+		});
 
-	@NonNull
-	private FileInputStream getFileInputStream(String p) {
-		try {
-			return new FileInputStream(p);
-		} catch (FileNotFoundException e) {
-			throw Exceptions.propagate(e);
-		}
+
 	}
 }

@@ -40,14 +40,15 @@ public interface RecordingScreenComponent {
 
 		@Provides
 		@PerScreen
-		IAudioRecorderInteractor recorder(Bus bus, AudioSettings settings) {
-			return new AudioTrackRecorderInteractor(bus, settings);
+		IAudioRecorderInteractor recorder(Bus bus, AudioSettings settings, AudioRepo audioRepo) {
+			return new AudioTrackRecorderInteractor(bus, settings, audioRepo);
 		}
 
 		@PerScreen
 		@Provides
-		AudioPlayerInteractor provideAudioPlayer(Context context,AudioSettings settings){
-			return new AudioTrackPlayerInteractorImpl(context,settings);
+		AudioPlayerInteractor provideAudioPlayer(Context context, AudioSettings settings,
+												 AudioRepo audioRepo){
+			return new AudioTrackPlayerInteractorImpl(context,settings, audioRepo);
 		}
 
 		@PerScreen
