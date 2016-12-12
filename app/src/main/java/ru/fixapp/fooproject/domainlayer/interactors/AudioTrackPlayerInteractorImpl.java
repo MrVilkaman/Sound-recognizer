@@ -14,6 +14,7 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 	private final AudioSettings settings;
 	private final AudioRepo audioRepo;
 	private AudioTrack audioTrack;
+	private boolean inPlay;
 
 	public AudioTrackPlayerInteractorImpl(Context context, AudioSettings settings,
 										  AudioRepo audioRepo) {
@@ -23,10 +24,9 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 
 	@Override
 	public Observable<Integer> play(String pathToFile, float offsetStart, float offsetEnd) {
-
+		inPlay = true;
 		return Observable.combineLatest(getObjectObservable(), audioRepo.getFileStreamObservable(pathToFile),
 				(o, container) -> container)
-//				.observeOn(Schedulers.newThread())
 				.map(container -> {
 					short[] buffer = new short[settings.getBufferSize()];
 					container.rewind();
@@ -34,7 +34,7 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 					int limit = (int) (long) offsetEnd;
 					limit = Math.min(limit,container.limit());
 					int totalWritten = 0;
-					while (container.position() < limit ) {
+					while (container.position() < limit && inPlay) {
 						int numSamplesLeft = limit - container.position();
 						int samplesToWrite;
 						if (numSamplesLeft >= buffer.length) {
@@ -52,6 +52,7 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 					}
 					return 0;
 				})
+				.doOnUnsubscribe(this::stop)
 				.map(q ->{
 					audioTrack.stop();
 					return 0;
@@ -77,6 +78,9 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 
 	@Override
 	public void stop() {
-
+		inPlay = false;
+		if (audioTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
+			audioTrack.stop();
+		}
 	}
 }
