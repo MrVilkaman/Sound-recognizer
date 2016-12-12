@@ -39,6 +39,7 @@ public class AudioTrackRecorderInteractor implements IAudioRecorderInteractor {
 		return Observable.combineLatest(getAudioRecordObservable(),
 				audioRepo.getDataStreamObservable(path),
 				(container, dataOutputStream) -> saveToFile(dataOutputStream, container))
+				.subscribeOn(Schedulers.io())
 				.ignoreElements()
 				.map(r -> null);
 	}

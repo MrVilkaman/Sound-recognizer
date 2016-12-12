@@ -74,7 +74,6 @@ public class AudioRepoImpl implements AudioRepo {
 	@Override
 	public Observable<DataOutputStream> getDataStreamObservable(String path) {
 		return Observable.fromCallable(() -> new DataOutputStream(
-				new BufferedOutputStream(new FileOutputStream(new File(path)))))
-				.subscribeOn(Schedulers.io());
+				new BufferedOutputStream(new FileOutputStream(new File(path)))));
 	}
 }

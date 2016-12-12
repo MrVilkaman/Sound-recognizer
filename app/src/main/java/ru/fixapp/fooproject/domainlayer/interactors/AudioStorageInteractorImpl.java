@@ -84,15 +84,20 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 
 	@Override
 	public Observable<Void> cutAudio(String path, long start, long end) {
+
+		Observable<String> temp = recordDP.getNextPathForAudio();
+
 		Observable<Container> map = recordDP.getFileStreamObservable(path)
 				.map(shortBuffer -> {
-					short[] shortBuff = new short[(int) (end - start)];
-					shortBuffer.get(shortBuff, (int) start, (int) end);
+					int shortCount = (int) (end - start);
+					short[] shortBuff = new short[shortCount];
+					shortBuffer.position((int) start);
+					shortBuffer.get(shortBuff, 0, shortCount);
 					return new Container(shortBuff);
 				});
-		Observable<DataOutputStream> dataStreamObservable = recordDP.getDataStreamObservable(path);
-		return Observable.zip(dataStreamObservable, map, (stream, container) -> {
 
+		Observable<DataOutputStream> other = temp.concatMap(recordDP::getDataStreamObservable);
+		return map.withLatestFrom(other, (container, stream) -> {
 			try {
 				short[] shorts = container.getAudioBuffer();
 				for (int i = 0; i < shorts.length; i++) {
