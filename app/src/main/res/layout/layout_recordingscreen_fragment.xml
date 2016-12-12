@@ -48,21 +48,21 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
-			android:text="Обрезать"/>
+			android:text="@string/record_cut"/>
 
 		<Button
 			android:id="@+id/recording_play"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
-			android:text="Проиграть"/>
+			android:text="@string/record_play"/>
 
 		<Button
 			android:id="@+id/recording_record"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
-			android:text="Записать"/>
+			android:text="@string/record_record"/>
 
 	</LinearLayout>
 

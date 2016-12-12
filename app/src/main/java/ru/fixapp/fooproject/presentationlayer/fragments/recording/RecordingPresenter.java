@@ -69,8 +69,15 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void playLastAudio() {
-		subscribeUI(audioPlayerInteractor.play(cache.getPath(), cache.getStart(), cache.getEnd()),
-				new RecordingViewIntegerViewSubscriber(view()));
+		if (cache.isNowInPlay()) {
+			view().showPlayBtn();
+			audioPlayerInteractor.stop();
+		} else {
+			subscribeUI(
+					audioPlayerInteractor.play(cache.getPath(), cache.getStart(), cache.getEnd(),
+							false),
+					new RecordingViewIntegerViewSubscriber(view()));
+		}
 	}
 
 	public void setNextTimePoint(long offset) {
@@ -98,7 +105,8 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void cutAudio() {
-		Observable<String> graphObs = storageInteractor.cutAudio(cache.getPath(),cache.getStart(), cache.getEnd());
+		Observable<String> graphObs =
+				storageInteractor.cutAudio(cache.getPath(), cache.getStart(), cache.getEnd());
 		subscribeUI(graphObs, new ViewSubscriber<RecordingView, String>(view()) {
 			@Override
 			public void onNext(String path) {
@@ -115,11 +123,24 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 
 	private static class RecordingViewIntegerViewSubscriber
 			extends ViewSubscriber<RecordingView, Integer> {
-		public RecordingViewIntegerViewSubscriber(RecordingView view) {super(view);}
+		public RecordingViewIntegerViewSubscriber(RecordingView view) {
+			super(view);
+			view().showPauseBtn();
+		}
 
 		@Override
 		public void onNext(Integer integer) {
 			//				view().setupVisualizerFxAndUI(integer);
+		}
+
+		@Override
+		public void onCompleted() {
+			view().showPlayBtn();
+		}
+
+		@Override
+		public void onError(Throwable e) {
+			view().showPlayBtn();
 		}
 	}
 

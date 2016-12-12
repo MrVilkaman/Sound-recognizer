@@ -23,7 +23,8 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 	}
 
 	@Override
-	public Observable<Integer> play(String pathToFile, float offsetStart, float offsetEnd) {
+	public Observable<Integer> play(String pathToFile, float offsetStart, float offsetEnd,
+									boolean reply) {
 		inPlay = true;
 		return Observable.combineLatest(getObjectObservable(), audioRepo.getFileStreamObservable(pathToFile),
 				(o, container) -> container)
@@ -37,7 +38,7 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 					while (container.position() < limit && inPlay) {
 						int numSamplesLeft = limit - container.position();
 						int samplesToWrite;
-						if (numSamplesLeft >= buffer.length) {
+						if (buffer.length <= numSamplesLeft) {
 							container.get(buffer);
 							samplesToWrite = buffer.length;
 						} else {
@@ -46,6 +47,9 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 							}
 							container.get(buffer, 0, numSamplesLeft);
 							samplesToWrite = numSamplesLeft;
+							if (reply) {
+								container.position((int) (long)offsetStart);
+							}
 						}
 						totalWritten += samplesToWrite;
 						audioTrack.write(buffer, 0, samplesToWrite);

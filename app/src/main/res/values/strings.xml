@@ -14,4 +14,8 @@
 	<string name="dialog_default_unauthorized">Не авторизован</string>
 	<string name="crop_done">Готово</string>
 	<string name="audio_recorded">Записано</string>
+	<string name="record_play">Проиграть</string>
+	<string name="record_stop">Остановить</string>
+	<string name="record_cut">Обрезать</string>
+	<string name="record_record">Записать</string>
 </resources>

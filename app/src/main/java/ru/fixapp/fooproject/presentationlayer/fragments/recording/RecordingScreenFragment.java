@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -39,6 +40,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@BindView(R.id.recording_audio_info) TextView textView;
 	@BindView(R.id.recording_audio_info_2) TextView textView2;
 	@BindView(R.id.recording_record) View recordButton;
+	@BindView(R.id.recording_play) Button playButton;
 	@BindView(R.id.recording_audio_visualizerview) LineChart lineChart;
 
 	public static RecordingScreenFragment create() {
@@ -174,6 +176,18 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@Override
 	public void setRangeTime(String text) {
 		textView2.setText(text);
+	}
+
+	@Override
+	public void showPlayBtn() {
+		cache.setNowInPlay(false);
+		playButton.setText(R.string.record_play);
+	}
+
+	@Override
+	public void showPauseBtn() {
+		cache.setNowInPlay(true);
+		playButton.setText(R.string.record_stop);
 	}
 
 	@Override

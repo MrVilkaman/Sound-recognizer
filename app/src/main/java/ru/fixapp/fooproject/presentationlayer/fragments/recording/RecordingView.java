@@ -15,4 +15,8 @@ public interface RecordingView extends BaseView {
 	void updateVisualizer(List<Entry> entries);
 
 	void setRangeTime(String text);
+
+	void showPlayBtn();
+
+	void showPauseBtn();
 }
