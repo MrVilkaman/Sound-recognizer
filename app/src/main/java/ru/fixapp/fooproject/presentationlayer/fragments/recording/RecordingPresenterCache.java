@@ -15,6 +15,7 @@ public class RecordingPresenterCache {
 	private boolean isStartNow = true;
 	private long sampleCount;
 	private boolean nowInPlay;
+	private boolean reply;
 
 	public boolean canRecord() {
 		return canRecord;
@@ -97,5 +98,13 @@ public class RecordingPresenterCache {
 
 	public boolean isNowInPlay() {
 		return nowInPlay;
+	}
+
+	public void setReply(boolean reply) {
+		this.reply = reply;
+	}
+
+	public boolean isReply() {
+		return reply;
 	}
 }

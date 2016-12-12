@@ -75,7 +75,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 		} else {
 			subscribeUI(
 					audioPlayerInteractor.play(cache.getPath(), cache.getStart(), cache.getEnd(),
-							false),
+							cache.isReply()),
 					new RecordingViewIntegerViewSubscriber(view()));
 		}
 	}

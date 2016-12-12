@@ -50,6 +50,12 @@
 			android:layout_gravity="center"
 			android:text="@string/record_cut"/>
 
+		<CheckBox
+			android:id="@+id/recording_check"
+			android:layout_gravity="center"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+
 		<Button
 			android:id="@+id/recording_play"
 			android:layout_width="wrap_content"

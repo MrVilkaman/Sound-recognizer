@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -41,6 +42,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@BindView(R.id.recording_audio_info_2) TextView textView2;
 	@BindView(R.id.recording_record) View recordButton;
 	@BindView(R.id.recording_play) Button playButton;
+	@BindView(R.id.recording_check) CheckBox playCheck;
 	@BindView(R.id.recording_audio_visualizerview) LineChart lineChart;
 
 	public static RecordingScreenFragment create() {
@@ -60,19 +62,6 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		return R.layout.layout_recordingscreen_fragment;
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
-		getToolbar().hide();
-		// dirty hack!! need more flexible way!
-		cache.restoreState(savedInstanceState);
-		Bundle arguments = getArguments();
-		if (arguments != null) {
-			cache.setCurrentPath(arguments.getString(PATH));
-		}
-
-		return super.onCreateView(inflater, container, savedInstanceState);
-	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -81,7 +70,23 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	}
 
 	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		// dirty hack!! need more flexible way!
+		cache.restoreState(savedInstanceState);
+		Bundle arguments = getArguments();
+		if (arguments != null) {
+			cache.setCurrentPath(arguments.getString(PATH));
+		}
+		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+
+	@Override
 	protected void onCreateView(View view, Bundle savedInstanceState) {
+		getToolbar().hide();
+
+		playCheck.setChecked(cache.isReply());
+		playCheck.setOnCheckedChangeListener((buttonView, isChecked) -> cache.setReply(isChecked));
 	}
 
 	@Override
