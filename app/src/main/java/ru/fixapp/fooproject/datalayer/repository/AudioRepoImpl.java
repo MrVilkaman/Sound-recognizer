@@ -60,13 +60,6 @@ public class AudioRepoImpl implements AudioRepo {
 					} catch (Exception e) {
 						throw Exceptions.propagate(e);
 					}
-//					finally {
-//						try {
-//							is.close();
-//						} catch (IOException e) {
-//							throw Exceptions.propagate(e);
-//						}
-//					}
 				});
 
 	}

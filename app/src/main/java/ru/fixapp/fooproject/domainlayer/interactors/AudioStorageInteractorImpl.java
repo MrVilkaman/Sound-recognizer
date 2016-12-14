@@ -23,13 +23,16 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 	private final AudioRepo recordDP;
 	private final FileInfoConverter fileInfoConverter;
 	private final AudioSettings audioSettings;
+	private final SignalProcessorInteractor signalProcessorInteractor;
 
 
 	public AudioStorageInteractorImpl(AudioRepo recordDP, FileInfoConverter fileInfoConverter,
-									  AudioSettings audioSettings) {
+									  AudioSettings audioSettings,
+									  SignalProcessorInteractor signalProcessorInteractor) {
 		this.recordDP = recordDP;
 		this.fileInfoConverter = fileInfoConverter;
 		this.audioSettings = audioSettings;
+		this.signalProcessorInteractor = signalProcessorInteractor;
 	}
 
 	@Override
@@ -70,6 +73,15 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 	public Observable<List<Entry>> getGraphInfo(String path) {
 		return recordDP.getFileStreamObservable(path)
 				.map(shortBuffer -> {
+					short[] shortBuff = new short[shortBuffer.limit()];
+					shortBuffer.get(shortBuff);
+					shortBuff = signalProcessorInteractor.getFrame(shortBuff);
+					shortBuffer.clear();
+					shortBuffer.put(shortBuff);
+					return shortBuffer;
+				})
+				.map(shortBuffer -> {
+					shortBuffer.rewind();
 					short[] shortBuff = new short[shortBuffer.limit()];
 					shortBuffer.get(shortBuff);
 					List<Entry> entries = new ArrayList<>();

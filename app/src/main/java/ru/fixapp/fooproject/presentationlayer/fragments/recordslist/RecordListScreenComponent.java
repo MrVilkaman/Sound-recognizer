@@ -8,6 +8,8 @@ import ru.fixapp.fooproject.di.PerScreen;
 import ru.fixapp.fooproject.domainlayer.FileInfoConverter;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractorImpl;
+import ru.fixapp.fooproject.domainlayer.interactors.SignalProcessorInteractor;
+import ru.fixapp.fooproject.domainlayer.interactors.SignalProcessorInteractorImpl;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 
@@ -23,8 +25,17 @@ public interface RecordListScreenComponent {
 		@PerScreen
 		@Provides AudioStorageInteractor provideAudioStorageInteractor(AudioRepo recordDP,
 																	   FileInfoConverter fileInfoConverter,
-																	   AudioSettings audioSettings){
-			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter, audioSettings);
+																	   AudioSettings audioSettings,
+																	   SignalProcessorInteractor
+																					   processorInteractor){
+			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter, audioSettings,
+					processorInteractor);
+		}
+
+		@PerScreen
+		@Provides
+		SignalProcessorInteractor provideSignalProcesserInteractor(){
+			return new SignalProcessorInteractorImpl();
 		}
 	}
 }
