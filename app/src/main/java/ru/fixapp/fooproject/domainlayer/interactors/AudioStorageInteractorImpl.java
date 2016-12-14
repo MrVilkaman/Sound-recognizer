@@ -72,14 +72,14 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 	@Override
 	public Observable<List<Entry>> getGraphInfo(String path) {
 		return recordDP.getFileStreamObservable(path)
-				.map(shortBuffer -> {
-					short[] shortBuff = new short[shortBuffer.limit()];
-					shortBuffer.get(shortBuff);
-					shortBuff = signalProcessorInteractor.getFrame(shortBuff);
-					shortBuffer.clear();
-					shortBuffer.put(shortBuff);
-					return shortBuffer;
-				})
+//				.map(shortBuffer -> {
+//					short[] shortBuff = new short[shortBuffer.limit()];
+//					shortBuffer.get(shortBuff);
+//					shortBuff = signalProcessorInteractor.getFrame(shortBuff);
+//					shortBuffer.clear();
+//					shortBuffer.put(shortBuff);
+//					return shortBuffer;
+//				})
 				.map(shortBuffer -> {
 					shortBuffer.rewind();
 					short[] shortBuff = new short[shortBuffer.limit()];

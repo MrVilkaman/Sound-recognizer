@@ -9,6 +9,6 @@ public class StopAudioSubscriber extends ErrorSubscriber<Void> {
 	@Override
 	public void onCompleted() {
 		view().showToast(R.string.audio_recorded);
-		((RecordingPresenter) view().getPresenter()).update();
+		((RecordingPresenter) view().getPresenter()).updateInfo();
 	}
 }

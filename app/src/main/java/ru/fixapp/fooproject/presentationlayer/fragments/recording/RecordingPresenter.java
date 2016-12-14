@@ -52,7 +52,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 		updateInfo();
 	}
 
-	private void updateInfo() {
+	void updateInfo() {
 		if (cache.hasPath()) {
 			Observable<AudioModel> modelObs = storageInteractor.getAudioInfo(cache.getPath());
 			subscribeUI(modelObs, new GetAudioInfoSubscriber(view(), cache, recordsFormat));

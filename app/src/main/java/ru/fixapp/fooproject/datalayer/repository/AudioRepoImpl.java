@@ -1,6 +1,8 @@
 package ru.fixapp.fooproject.datalayer.repository;
 
 
+import android.support.annotation.NonNull;
+
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -15,6 +17,7 @@ import rx.Observable;
 import rx.exceptions.Exceptions;
 import rx.schedulers.Schedulers;
 
+import static rx.Observable.fromCallable;
 import static rx.Observable.just;
 
 public class AudioRepoImpl implements AudioRepo {
@@ -42,11 +45,28 @@ public class AudioRepoImpl implements AudioRepo {
 		return just(storageUtils.getStoragePath()).map(s -> s + "/audio/");
 	}
 
+	private long lastModified;
+	private ShortBuffer cacheBuffer;
+
 	@Override
 	public Observable<ShortBuffer> getFileStreamObservable(String path) {
 		return Observable.fromCallable(
-				() -> new FileInputStream(new File(path)))
+				() -> new File(path))
 				.subscribeOn(Schedulers.io())
+				.concatMap(file -> {
+					long l = file.lastModified();
+					if (l != lastModified || cacheBuffer == null) {
+						return readFromFile(file).doOnNext(ignore -> lastModified = l);
+					}else{
+						return fromCallable(() -> cacheBuffer);
+					}
+				});
+
+	}
+
+	@NonNull
+	private Observable<ShortBuffer> readFromFile(File file) {
+		return fromCallable(() -> new FileInputStream(file))
 				.map(is -> {
 					try {
 						ByteBuffer allocate = ByteBuffer.allocate(is.available());
@@ -60,8 +80,7 @@ public class AudioRepoImpl implements AudioRepo {
 					} catch (Exception e) {
 						throw Exceptions.propagate(e);
 					}
-				});
-
+				}).doOnNext(shortBuffer -> cacheBuffer = shortBuffer);
 	}
 
 	@Override

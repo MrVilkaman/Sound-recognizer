@@ -18,6 +18,6 @@ public class CutAudioSubscriber extends ViewSubscriber<RecordingView, String> {
 
 	@Override
 	public void onCompleted() {
-		((RecordingPresenter) view().getPresenter()).update();
+		((RecordingPresenter) view().getPresenter()).updateInfo();
 	}
 }
