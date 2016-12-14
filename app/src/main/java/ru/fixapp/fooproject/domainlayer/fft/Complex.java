@@ -12,6 +12,14 @@ public class Complex {
 		this.imaginary = imaginary;
 	}
 
+	public double getImaginary() {
+		return imaginary;
+	}
+
+	public double getReal() {
+		return real;
+	}
+
 	public double getMagnitude() {
 		return Math.sqrt(real * real + imaginary * imaginary);
 	}

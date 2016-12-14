@@ -148,13 +148,12 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		lineChart.setDescription(desc);
 		lineChart.setDrawGridBackground(false);
 
-
-		lineChart.getXAxis()
-				.setValueFormatter((value, axis) -> {
-					float v = 1000f * axis.mAxisMaximum / cache.getDuraction();
-
-					return String.format("%.2f", value / v);
-				});
+//
+//		lineChart.getXAxis()
+//				.setValueFormatter((value, axis) -> {
+//					float v = 1000f * axis.mAxisMaximum / cache.getDuraction();
+//					return String.format("%.2f", value / v);
+//				});
 
 		lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
 			@Override
