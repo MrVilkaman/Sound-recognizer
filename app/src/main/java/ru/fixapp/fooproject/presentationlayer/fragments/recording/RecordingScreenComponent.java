@@ -1,8 +1,6 @@
 package ru.fixapp.fooproject.presentationlayer.fragments.recording;
 
 
-import android.content.Context;
-
 import net.jokubasdargis.rxbus.Bus;
 
 import dagger.Component;
@@ -51,9 +49,12 @@ public interface RecordingScreenComponent {
 
 		@PerScreen
 		@Provides
-		AudioPlayerInteractor provideAudioPlayer(Context context, AudioSettings settings,
-												 AudioRepo audioRepo){
-			return new AudioTrackPlayerInteractorImpl(context,settings, audioRepo);
+		AudioPlayerInteractor provideAudioPlayer(AudioSettings settings,
+												 AudioRepo audioRepo,
+												 SignalProcessorInteractor
+														 signalProcessorInteractor){
+			return new AudioTrackPlayerInteractorImpl(settings, audioRepo,
+					signalProcessorInteractor);
 		}
 
 		@PerScreen

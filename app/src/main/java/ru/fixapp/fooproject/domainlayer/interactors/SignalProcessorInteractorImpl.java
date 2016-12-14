@@ -21,17 +21,22 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 		while (work) {
 			int newPos = currentPos + frameSize;
 			work = newPos < shortBuff.length;
-				short[] range = Arrays.copyOfRange(shortBuff, currentPos, currentPos + frameSize);
-				short[] afterWindow = new short[range.length];
-				for (int i = 0; i < frameSize; i++) {
-					double gausse = getWindow(range[i]);
-					afterWindow[i] = (short) (range[i] * gausse);
-				}
+			short[] range = Arrays.copyOfRange(shortBuff, currentPos, currentPos + frameSize);
+			short[] afterWindow = new short[range.length];
+			for (int i = 0; i < frameSize; i++) {
+				double gausse = getWindow(range[i]);
+				afterWindow[i] = (short) ( gausse * range[i]);
+
+//				if(Math.signum(range[i]) == -1){
+//					int curre= currentPos;
+//					curre++;
+//				}
+			}
 			if (work) {
-				System.arraycopy(range, 0, shorts, currentPos, range.length);
+				System.arraycopy(afterWindow, 0, shorts, currentPos, afterWindow.length);
 			} else {
 				int length = shortBuff.length - currentPos;
-				System.arraycopy(range, 0, shorts, currentPos, length);
+				System.arraycopy(afterWindow, 0, shorts, currentPos, length);
 			}
 			currentPos = newPos;
 		}
@@ -40,5 +45,5 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 		return shorts;
 	}
 
-	private double getWindow(short n) {return Window.blackmannHarris(n, frameSize);}
+	private double getWindow(short n) {return Window.rectangle(n,frameSize);}
 }

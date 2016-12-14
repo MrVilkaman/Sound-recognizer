@@ -1,10 +1,11 @@
 package ru.fixapp.fooproject.domainlayer.interactors;
 
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.support.annotation.NonNull;
+
+import java.nio.ShortBuffer;
 
 import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
@@ -15,18 +16,34 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 	private final AudioRepo audioRepo;
 	private AudioTrack audioTrack;
 	private boolean inPlay;
+	private SignalProcessorInteractor signalProcessorInteractor;
 
-	public AudioTrackPlayerInteractorImpl(Context context, AudioSettings settings,
-										  AudioRepo audioRepo) {
+	public AudioTrackPlayerInteractorImpl( AudioSettings settings,
+										  AudioRepo audioRepo,
+										   SignalProcessorInteractor signalProcessorInteractor) {
 		this.settings = settings;
 		this.audioRepo = audioRepo;
+		this.signalProcessorInteractor = signalProcessorInteractor;
 	}
 
 	@Override
 	public Observable<Integer> play(String pathToFile, float offsetStart, float offsetEnd,
 									boolean reply) {
 		inPlay = true;
-		return Observable.combineLatest(getObjectObservable(), audioRepo.getFileStreamObservable(pathToFile),
+		Observable<ShortBuffer> fileStreamObservable =
+				audioRepo.getFileStreamObservable(pathToFile)
+						.map(shortBuffer -> {
+							ShortBuffer duplicate = shortBuffer.duplicate();
+							duplicate.rewind();
+							short[] shortBuff = new short[duplicate.limit()];
+							duplicate.get(shortBuff);
+							shortBuff = signalProcessorInteractor.getFrame(shortBuff);
+							duplicate.clear();
+							duplicate.put(shortBuff);
+							return shortBuffer;
+						});
+		return Observable.combineLatest(getObjectObservable(),
+				fileStreamObservable,
 				(o, container) -> container)
 				.map(container -> {
 					short[] buffer = new short[settings.getBufferSize()];

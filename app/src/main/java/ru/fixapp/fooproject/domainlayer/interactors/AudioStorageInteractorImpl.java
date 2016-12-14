@@ -7,6 +7,7 @@ import com.github.mikephil.charting.data.Entry;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,14 +73,16 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 	@Override
 	public Observable<List<Entry>> getGraphInfo(String path) {
 		return recordDP.getFileStreamObservable(path)
-//				.map(shortBuffer -> {
-//					short[] shortBuff = new short[shortBuffer.limit()];
-//					shortBuffer.get(shortBuff);
-//					shortBuff = signalProcessorInteractor.getFrame(shortBuff);
-//					shortBuffer.clear();
-//					shortBuffer.put(shortBuff);
-//					return shortBuffer;
-//				})
+				.map(shortBuffer -> {
+					ShortBuffer duplicate = shortBuffer.duplicate();
+					duplicate.rewind();
+					short[] shortBuff = new short[duplicate.limit()];
+					duplicate.get(shortBuff);
+					shortBuff = signalProcessorInteractor.getFrame(shortBuff);
+					duplicate.clear();
+					duplicate.put(shortBuff);
+					return shortBuffer;
+				})
 				.map(shortBuffer -> {
 					shortBuffer.rewind();
 					short[] shortBuff = new short[shortBuffer.limit()];
