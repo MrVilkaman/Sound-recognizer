@@ -6,12 +6,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.datalayer.subscriber.ErrorSubscriber;
-import ru.fixapp.fooproject.datalayer.subscriber.ViewSubscriber;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
+import ru.fixapp.fooproject.domainlayer.interactors.SignalProcessorInteractor;
 import ru.fixapp.fooproject.presentationlayer.formaters.RecordsFormat;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
@@ -22,6 +21,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	private final IAudioRecorderInteractor audioRecorder;
 	private final AudioPlayerInteractor audioPlayerInteractor;
 	private final AudioStorageInteractor storageInteractor;
+	private final SignalProcessorInteractor signalProcessorInteractor;
 
 	private final RecordingPresenterCache cache;
 	private final RecordsFormat recordsFormat;
@@ -30,10 +30,12 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	public RecordingPresenter(IAudioRecorderInteractor audioRecorder,
 							  AudioPlayerInteractor audioPlayerInteractor,
 							  AudioStorageInteractor storageInteractor,
+							  SignalProcessorInteractor signalProcessorInteractor,
 							  RecordingPresenterCache cache, RecordsFormat recordsFormat) {
 		this.audioRecorder = audioRecorder;
 		this.audioPlayerInteractor = audioPlayerInteractor;
 		this.storageInteractor = storageInteractor;
+		this.signalProcessorInteractor = signalProcessorInteractor;
 		this.cache = cache;
 		this.recordsFormat = recordsFormat;
 	}
@@ -53,10 +55,10 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	private void updateInfo() {
 		if (cache.hasPath()) {
 			Observable<AudioModel> modelObs = storageInteractor.getAudioInfo(cache.getPath());
-			subscribeUI(modelObs, new GetAudioInfoSubscriber());
+			subscribeUI(modelObs, new GetAudioInfoSubscriber(view(), cache, recordsFormat));
 
 			Observable<List<Entry>> graphObs = storageInteractor.getGraphInfo(cache.getPath());
-			subscribeUI(graphObs, new RecordingViewListViewSubscriber(view()));
+			subscribeUI(graphObs, new LoadTrackGraphSubscriber(view()));
 		}
 	}
 
@@ -65,7 +67,7 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	}
 
 	public void stopRecording() {
-		subscribe(audioRecorder.stop(), new VoidErrorSubscriber(view()));
+		subscribe(audioRecorder.stop(), new StopAudioSubscriber(view()));
 	}
 
 	public void playLastAudio() {
@@ -76,104 +78,38 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 			subscribeUI(
 					audioPlayerInteractor.play(cache.getPath(), cache.getStart(), cache.getEnd(),
 							cache.isReply()),
-					new RecordingViewIntegerViewSubscriber(view()));
+					new PlayAudioSubscriber(view()));
 		}
 	}
 
 	public void setNextTimePoint(long offset) {
 		boolean startNow = cache.isStartNow();
-		if (startNow) {
-			long max = Math.max(cache.getEnd(), offset);
-			long min = Math.min(cache.getEnd(), offset);
-			cache.setStart(min);
-			cache.setEnd(max);
-		} else {
-			long max = Math.max(cache.getStart(), offset);
-			long min = Math.min(cache.getStart(), offset);
-			cache.setStart(min);
-			cache.setEnd(max);
-		}
+		swapEnds(offset, startNow ? cache.getEnd() : cache.getStart());
 		cache.setStartNow(!startNow);
 		update();
 	}
 
-	private void update() {
+	private void swapEnds(long offset, long end) {
+		long max = Math.max(end, offset);
+		long min = Math.min(end, offset);
+		cache.setStart(min);
+		cache.setEnd(max);
+	}
+
+	void update() {
 		view().setRangeTime(
 				recordsFormat.formatOffset(cache.getStart(), cache.getEnd(), cache
-								.getSampleCount(),
-						cache.getDuraction()));
+						.getSampleCount(), cache.getDuraction()));
 	}
 
 	public void cutAudio() {
 		Observable<String> graphObs =
 				storageInteractor.cutAudio(cache.getPath(), cache.getStart(), cache.getEnd());
-		subscribeUI(graphObs, new ViewSubscriber<RecordingView, String>(view()) {
-			@Override
-			public void onNext(String path) {
-				super.onNext(path);
-				cache.setCurrentPath(path);
-			}
-
-			@Override
-			public void onCompleted() {
-				updateInfo();
-			}
-		});
+		subscribeUI(graphObs, new CutAudioSubscriber(view(), cache));
 	}
 
-	private static class RecordingViewIntegerViewSubscriber
-			extends ViewSubscriber<RecordingView, Integer> {
-		public RecordingViewIntegerViewSubscriber(RecordingView view) {
-			super(view);
-			view().showPauseBtn();
-		}
+	public void doProcess() {
 
-		@Override
-		public void onNext(Integer integer) {
-			//				view().setupVisualizerFxAndUI(integer);
-		}
-
-		@Override
-		public void onCompleted() {
-			view().showPlayBtn();
-		}
-
-		@Override
-		public void onError(Throwable e) {
-			view().showPlayBtn();
-		}
-	}
-
-	private static class RecordingViewListViewSubscriber
-			extends ViewSubscriber<RecordingView, List<Entry>> {
-		public RecordingViewListViewSubscriber(RecordingView view) {super(view);}
-
-		@Override
-		public void onNext(List<Entry> entries) {
-			view().updateVisualizer(entries);
-		}
-	}
-
-	private class GetAudioInfoSubscriber
-			extends ViewSubscriber<RecordingView, AudioModel> {
-		public GetAudioInfoSubscriber() {super(RecordingPresenter.this.view());}
-
-		@Override
-		public void onNext(AudioModel model) {
-			cache.setDuraction(model.getDuration());
-			cache.setSampleCount(model.getSampleCount());
-			view().showAudioInfo(recordsFormat.format(model));
-			update();
-		}
-	}
-
-	private class VoidErrorSubscriber extends ErrorSubscriber<Void> {
-		public VoidErrorSubscriber(RecordingView view) {super(view);}
-
-		@Override
-		public void onCompleted() {
-			view().showToast(R.string.audio_recorded);
-			updateInfo();
-		}
 	}
 }
+

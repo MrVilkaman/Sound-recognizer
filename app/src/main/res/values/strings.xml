@@ -18,4 +18,5 @@
 	<string name="record_stop">Остановить</string>
 	<string name="record_cut">Обрезать</string>
 	<string name="record_record">Записать</string>
+	<string name="recording_do_process">Обработать</string>
 </resources>

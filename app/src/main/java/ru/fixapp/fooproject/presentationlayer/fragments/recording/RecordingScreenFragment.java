@@ -109,6 +109,11 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		getPresenter().cutAudio();
 	}
 
+	@OnClick(R.id.recording_do_process)
+	void onClickDoProcess() {
+		getPresenter().doProcess();
+	}
+
 	@OnTouch(R.id.recording_record)
 	boolean onTouchRecord(View view, MotionEvent event) {
 		switch (event.getAction()) {
