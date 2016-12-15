@@ -81,10 +81,10 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 				.map(integer -> {
 
 					DoubleBuffer allocate = DoubleBuffer.allocate(integer);
-						double co = 2 * Math.PI * Math.PI/180 / (audioSettings.getSampleRate());
+						double co = 2 * Math.PI  / audioSettings.getSampleRate();
 					for (int x = 0; x < integer; x++) {
 						double f1 = 1000 * co;
-						double f2 = 500* co;
+//						double f2 = 500* co;
 						double v = Math.sin(f1*x);
 //								0.5 * Math.sin(f2*x);
 						allocate.put((float) v);
@@ -98,8 +98,8 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 					List<Entry> entries = new ArrayList<>();
 					if (audioSettings.isPCM16BIT()) {
 						for (int i = 0; i < frame.length; i++) {
-							float phase = (float) frame[i].getPhase();
-							entries.add(new Entry(i, Math.abs(phase)));
+							float phase = (float) frame[i].getMagnitude();
+							entries.add(new Entry(i, (float) shortBuff[i]));
 						}
 					}
 					return entries;
