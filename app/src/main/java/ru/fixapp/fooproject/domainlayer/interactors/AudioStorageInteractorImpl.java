@@ -13,6 +13,7 @@ import java.util.List;
 import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.FileInfoConverter;
 import ru.fixapp.fooproject.domainlayer.fft.Complex;
+import ru.fixapp.fooproject.domainlayer.fft.MFCC;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import ru.fixapp.fooproject.domainlayer.models.Container;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
@@ -72,65 +73,34 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 
 	@Override
 	public Observable<List<Entry>> getGraphInfo(String path) {
-//		return Observable.fromCallable(() -> {
-////			double v1 = 1000d * audioSettings.getSampleRate() / 1000;
-//			double v1 = 512;
-//			return (int)v1;
-//		})
-//				.map(integer -> {
-//
-//					DoubleBuffer allocate = DoubleBuffer.allocate(integer);
-//						double co = 2 * Math.PI  / audioSettings.getSampleRate();
-//					for (int x = 0; x < integer; x++) {
-//						double f1 = 1000 * co;
-////						double f2 = 500* co;
-//						double v = Math.sin(f1*x);
-////								0.5 * Math.sin(f2*x);
-//						allocate.put((float) v);
-//					}
-//					return allocate;
-//				}).map(shortBuffer -> {
-//					shortBuffer.rewind();
-//					double[] shortBuff = new double[shortBuffer.limit()];
-//					shortBuffer.get(shortBuff);
-//					Complex[] frame = signalProcessorInteractor.getFrame(shortBuff);
-//					List<Entry> entries = new ArrayList<>();
-//					if (audioSettings.isPCM16BIT()) {
-//						for (int i = 0; i < frame.length; i++) {
-//							float phase = (float) frame[i].getMagnitude();
-//							entries.add(new Entry(i, (float) shortBuff[i]));
-//						}
-//					}
-//					return entries;
-//				});
-
 		return recordDP.getFileStreamObservable(path)
-//				.map(shortBuffer -> {
-//					ShortBuffer duplicate = shortBuffer.duplicate();
-//					duplicate.rewind();
-//					short[] shortBuff = new short[duplicate.limit()];
-//					duplicate.get(shortBuff);
-//					shortBuff = signalProcessorInteractor.getFrame(shortBuff);
-//					duplicate.clear();
-//					duplicate.put(shortBuff);
-//					return shortBuffer;
-//				})
 				.map(shortBuffer -> {
 					shortBuffer.rewind();
 					short[] shortBuff = new short[shortBuffer.limit()];
 					shortBuffer.get(shortBuff);
-					int length = Math.min(shortBuffer.limit(),shortBuffer.limit());
+					int length = Math.min(shortBuffer.limit(),512);
 					double[] doubleBuff = new double[length];
 					for (int i = 0; i < length; i++) {
 						doubleBuff[i] = shortBuff[i];
 					}
 
 					Complex[] frame = signalProcessorInteractor.getFrame(doubleBuff);
+					MFCC mfcc = new MFCC(512, 13, 13, audioSettings.getSampleRate());
+
+					double[] doubleBuff2 = new double[frame.length];
+					double[] doubleBuff2Im = new double[frame.length];
+					for (int i = 0; i < frame.length; i++) {
+						doubleBuff2[i] = frame[i].getReal();
+						doubleBuff2Im[i] = frame[i].getImaginary();
+					}
+
+					double[] doubleBuff2Res = mfcc.cepstrum(doubleBuff2,doubleBuff2Im);
+
 					List<Entry> entries = new ArrayList<>();
 					if (audioSettings.isPCM16BIT()) {
-						for (int i = 0; i < frame.length; i++) {
-							float phase = (float) frame[i].getMagnitude();
-							entries.add(new Entry(i, phase));
+						for (int i = 0; i < doubleBuff2Res.length; i++) {
+//							float phase = (float) frame[i].getMagnitude();
+							entries.add(new Entry(i,(float) doubleBuff2Res[i]));
 						}
 					}
 					return entries;

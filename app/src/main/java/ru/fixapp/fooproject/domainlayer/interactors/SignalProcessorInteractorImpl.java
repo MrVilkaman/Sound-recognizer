@@ -94,7 +94,7 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 
 
 
-	private double getWindow(double n) {return Window.rectangle(n, frameSize);}
+	private double getWindow(double n) {return Window.hamming(n, frameSize);}
 
 
 	public Complex[] decimationInTime(double[] frame) {
