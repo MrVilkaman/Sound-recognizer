@@ -7,7 +7,6 @@ import com.github.mikephil.charting.data.Entry;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,39 +72,39 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 
 	@Override
 	public Observable<List<Entry>> getGraphInfo(String path) {
-		return Observable.fromCallable(() -> {
-//			double v1 = 1000d * audioSettings.getSampleRate() / 1000;
-			double v1 = 512;
-			return (int)v1;
-		})
-				.map(integer -> {
+//		return Observable.fromCallable(() -> {
+////			double v1 = 1000d * audioSettings.getSampleRate() / 1000;
+//			double v1 = 512;
+//			return (int)v1;
+//		})
+//				.map(integer -> {
+//
+//					DoubleBuffer allocate = DoubleBuffer.allocate(integer);
+//						double co = 2 * Math.PI  / audioSettings.getSampleRate();
+//					for (int x = 0; x < integer; x++) {
+//						double f1 = 1000 * co;
+////						double f2 = 500* co;
+//						double v = Math.sin(f1*x);
+////								0.5 * Math.sin(f2*x);
+//						allocate.put((float) v);
+//					}
+//					return allocate;
+//				}).map(shortBuffer -> {
+//					shortBuffer.rewind();
+//					double[] shortBuff = new double[shortBuffer.limit()];
+//					shortBuffer.get(shortBuff);
+//					Complex[] frame = signalProcessorInteractor.getFrame(shortBuff);
+//					List<Entry> entries = new ArrayList<>();
+//					if (audioSettings.isPCM16BIT()) {
+//						for (int i = 0; i < frame.length; i++) {
+//							float phase = (float) frame[i].getMagnitude();
+//							entries.add(new Entry(i, (float) shortBuff[i]));
+//						}
+//					}
+//					return entries;
+//				});
 
-					DoubleBuffer allocate = DoubleBuffer.allocate(integer);
-						double co = 2 * Math.PI  / audioSettings.getSampleRate();
-					for (int x = 0; x < integer; x++) {
-						double f1 = 1000 * co;
-//						double f2 = 500* co;
-						double v = Math.sin(f1*x);
-//								0.5 * Math.sin(f2*x);
-						allocate.put((float) v);
-					}
-					return allocate;
-				}).map(shortBuffer -> {
-					shortBuffer.rewind();
-					double[] shortBuff = new double[shortBuffer.limit()];
-					shortBuffer.get(shortBuff);
-					Complex[] frame = signalProcessorInteractor.getFrame(shortBuff);
-					List<Entry> entries = new ArrayList<>();
-					if (audioSettings.isPCM16BIT()) {
-						for (int i = 0; i < frame.length; i++) {
-							float phase = (float) frame[i].getMagnitude();
-							entries.add(new Entry(i, (float) shortBuff[i]));
-						}
-					}
-					return entries;
-				});
-
-//		return recordDP.getFileStreamObservable(path)
+		return recordDP.getFileStreamObservable(path)
 //				.map(shortBuffer -> {
 //					ShortBuffer duplicate = shortBuffer.duplicate();
 //					duplicate.rewind();
@@ -116,18 +115,26 @@ public class AudioStorageInteractorImpl implements AudioStorageInteractor {
 //					duplicate.put(shortBuff);
 //					return shortBuffer;
 //				})
-//				.map(shortBuffer -> {
-//					shortBuffer.rewind();
-//					short[] shortBuff = new short[shortBuffer.limit()];
-//					shortBuffer.get(shortBuff);
-//					List<Entry> entries = new ArrayList<>();
-//					if (audioSettings.isPCM16BIT()) {
-//						for (int i = 0; i < shortBuff.length; i++) {
-//							entries.add(new Entry(i, shortBuff[i]));
-//						}
-//					}
-//					return entries;
-//				});
+				.map(shortBuffer -> {
+					shortBuffer.rewind();
+					short[] shortBuff = new short[shortBuffer.limit()];
+					shortBuffer.get(shortBuff);
+					int length = Math.min(shortBuffer.limit(),shortBuffer.limit());
+					double[] doubleBuff = new double[length];
+					for (int i = 0; i < length; i++) {
+						doubleBuff[i] = shortBuff[i];
+					}
+
+					Complex[] frame = signalProcessorInteractor.getFrame(doubleBuff);
+					List<Entry> entries = new ArrayList<>();
+					if (audioSettings.isPCM16BIT()) {
+						for (int i = 0; i < frame.length; i++) {
+							float phase = (float) frame[i].getMagnitude();
+							entries.add(new Entry(i, phase));
+						}
+					}
+					return entries;
+				});
 	}
 
 	@Override
