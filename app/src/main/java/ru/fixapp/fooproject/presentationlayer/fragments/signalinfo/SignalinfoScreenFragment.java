@@ -14,6 +14,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import ru.fixapp.fooproject.R;
+import ru.fixapp.fooproject.domainlayer.fft.FFTModel;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 import ru.fixapp.fooproject.presentationlayer.custonview.SpecView;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
@@ -59,6 +60,11 @@ public class SignalinfoScreenFragment extends BaseFragment<SignalinfoPresenter>
 				.activityComponent(component)
 				.build()
 				.inject(this);
+	}
+
+	@Override
+	public void drawSpectr(FFTModel model) {
+		specView.setModel(model);
 	}
 
 	@Override

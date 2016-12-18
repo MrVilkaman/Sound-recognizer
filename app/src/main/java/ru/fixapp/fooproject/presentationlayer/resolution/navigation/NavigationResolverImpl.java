@@ -9,8 +9,8 @@ import ru.fixapp.fooproject.BuildConfig;
 import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.presentationlayer.activities.BaseActivityView;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
+import ru.fixapp.fooproject.presentationlayer.fragments.recording.RecordingScreenFragment;
 import ru.fixapp.fooproject.presentationlayer.fragments.recordslist.RecordListScreenFragment;
-import ru.fixapp.fooproject.presentationlayer.fragments.signalinfo.SignalinfoScreenFragment;
 import ru.fixapp.fooproject.presentationlayer.resolution.UIResolver;
 import ru.fixapp.fooproject.presentationlayer.resolution.drawer.LeftDrawerHelper;
 import ru.fixapp.fooproject.presentationlayer.resolution.fragments.FragmentResolver;
@@ -67,7 +67,8 @@ public class NavigationResolverImpl implements NavigationResolver {
 	@Override
 	public BaseFragment createStartFragment() {
 		if (BuildConfig.DEBUG) {
-			return SignalinfoScreenFragment.open("/storage/emulated/0/Android/data/ru.fixapp.fooproject/files/audio/3ad6d071-f521-4ce7-9655-8cc8f6eddd6f.3gpp");
+//			return SignalinfoScreenFragment.open("/storage/emulated/0/Android/data/ru.fixapp.fooproject/files/audio/3ad6d071-f521-4ce7-9655-8cc8f6eddd6f.3gpp");
+			return RecordingScreenFragment.open("/storage/emulated/0/Android/data/ru.fixapp.fooproject/files/audio/3ad6d071-f521-4ce7-9655-8cc8f6eddd6f.3gpp");
 		}
 		return RecordListScreenFragment.open();
 	}

@@ -8,7 +8,10 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.List;
 import java.util.Random;
+
+import ru.fixapp.fooproject.domainlayer.fft.FFTModel;
 
 public class SpecView extends View {
 
@@ -17,6 +20,7 @@ public class SpecView extends View {
 	private Paint paint;
 
 	private Random random;
+	private FFTModel model;
 
 	public SpecView(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -38,9 +42,16 @@ public class SpecView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
+		if (model == null) {
+			return;
+		}
 
-		int XN = 10;
-		int YN = 255;
+		List<double[]> list = model.getList();
+		int XN = list.size();
+		if (XN == 0) {
+			return;
+		}
+		int YN = list.get(0).length;
 
 		float dX = originalWidth / XN;
 		float dY = originalHeight / YN;
@@ -48,12 +59,15 @@ public class SpecView extends View {
 		float left = 0;
 		float right = dX;
 
-
+		double dif = model.getMax() - model.getMin();
+		double modelMin = model.getMin();
 		for (int i = 0; i < XN; i++) {
 			float top = 0;
 			float bottom = dY;
-			for (int j = 0; j < YN ; j++) {
-				int col = j;
+			double[] doubles = list.get(i);
+			for (int j = YN - 1; 0 <= j; j--) {
+				int col = (int) ((doubles[j] - modelMin)/ dif *255);
+
 				paint.setColor(Color.rgb(col, 255-col, 0));
 				canvas.drawRect(left, top, right, bottom, paint);
 				top += dY;
@@ -73,5 +87,10 @@ public class SpecView extends View {
 
 		super.onMeasure(MeasureSpec.makeMeasureSpec((int) originalWidth, MeasureSpec.EXACTLY),
 				MeasureSpec.makeMeasureSpec((int) originalHeight, MeasureSpec.EXACTLY));
+	}
+
+	public void setModel(FFTModel model) {
+		this.model = model;
+		invalidate();
 	}
 }

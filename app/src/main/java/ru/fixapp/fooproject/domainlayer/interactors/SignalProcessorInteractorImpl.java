@@ -8,7 +8,7 @@ import java.util.List;
 
 import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.fft.Complex;
-import ru.fixapp.fooproject.domainlayer.fft.MFCC;
+import ru.fixapp.fooproject.domainlayer.fft.FFTModel;
 import ru.fixapp.fooproject.domainlayer.fft.Window;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import rx.Observable;
@@ -26,11 +26,15 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 		frameSize = 512;
 	}
 
-	private Complex[] getFrame(double[] shortBuff) {
-		Complex[] shorts = new Complex[shortBuff.length / 2];
+	private FFTModel getFrame(double[] shortBuff) {
+
+		List<double[]> spectr = new ArrayList<>();
 
 		int currentPos = 0;
 		boolean work = true;
+		double min = Double.MAX_VALUE;
+		double max = Double.MIN_VALUE;
+
 		while (work) {
 			int newPos = currentPos + frameSize;
 			work = newPos < shortBuff.length;
@@ -50,18 +54,20 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 			//			for (int i = 0; i < frameSize; i++) {
 			//				afterWindow[i] = (short) complices[i].getPhase();
 			//			}
-
-			if (work) {
-				System.arraycopy(complices, 0, shorts, currentPos / 2, afterWindow.length / 2);
-			} else {
-				int length = shortBuff.length - currentPos;
-				System.arraycopy(complices, 0, shorts, currentPos / 2, length / 2);
+			int len = complices.length / 2 + 1;
+			double[] fr = new double[len];
+			for (int i = 0; i < len; i++) {
+				double magnitude = complices[i].getMagnitude();
+				min = Math.min(magnitude, min);
+				max = Math.max(magnitude, max);
+				fr[i] = magnitude;
 			}
+			spectr.add(fr);
 			currentPos = newPos;
 		}
 		//		Arrays.fill(shorts,frameSize,shortBuff.length, (short) 0);
 
-		return shorts;
+		return new FFTModel(spectr,min,max);
 	}
 
 	private double getWindow(double n) {
@@ -134,37 +140,31 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 	}
 
 	@Override
-	public Observable<List<Entry>> getGraphFFTInfo(String path) {
+	public Observable<FFTModel> getGraphFFTInfo(String path) {
 		return recordDP.getFileStreamObservable(path)
 				.map(shortBuffer -> {
 					shortBuffer.rewind();
 					short[] shortBuff = new short[shortBuffer.limit()];
 					shortBuffer.get(shortBuff);
-					int length = Math.min(shortBuffer.limit(), 512);
+					int length = shortBuffer.limit();
 					double[] doubleBuff = new double[length];
 					for (int i = 0; i < length; i++) {
 						doubleBuff[i] = shortBuff[i];
 					}
 
-					Complex[] frame = getFrame(doubleBuff);
-					MFCC mfcc = new MFCC(512, 13, 13, audioSettings.getSampleRate());
-
-					double[] doubleBuff2 = new double[frame.length];
-					double[] doubleBuff2Im = new double[frame.length];
-					for (int i = 0; i < frame.length; i++) {
-						doubleBuff2[i] = frame[i].getReal();
-						doubleBuff2Im[i] = frame[i].getImaginary();
-					}
-
-					double[] doubleBuff2Res = mfcc.cepstrum(doubleBuff2, doubleBuff2Im);
-
-					List<Entry> entries = new ArrayList<>();
-					if (audioSettings.isPCM16BIT()) {
-						for (int i = 0; i < doubleBuff2Res.length; i++) {
-							entries.add(new Entry(i, (float) doubleBuff2Res[i]));
-						}
-					}
-					return entries;
+					//					MFCC mfcc = new MFCC(512, 13, 13, audioSettings
+					// .getSampleRate());
+					//
+					//					double[] doubleBuff2 = new double[frame.length];
+					//					double[] doubleBuff2Im = new double[frame.length];
+					//					for (int i = 0; i < frame.length; i++) {
+					//						doubleBuff2[i] = frame[i].getReal();
+					//						doubleBuff2Im[i] = frame[i].getImaginary();
+					//					}
+					//
+					//					double[] doubleBuff2Res = mfcc.cepstrum(doubleBuff2,
+					// doubleBuff2Im);
+					return getFrame(doubleBuff);
 				});
 	}
 
