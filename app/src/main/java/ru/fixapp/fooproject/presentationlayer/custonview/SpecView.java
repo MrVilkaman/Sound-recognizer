@@ -41,8 +41,9 @@ public class SpecView extends View {
 
 		if (isInEditMode()) {
 			List<SignalFeature> signalFeatures =
-					Arrays.asList(new SignalFeature(new double[]{51, 0, 14, 12, 85, 16, 99}, null));
-			model = new FFTModel(signalFeatures,0,100);
+					Arrays.asList(new SignalFeature(new double[]{ 51, 14,0,12, 85, 16, 99,2,100},
+							null));
+			model = new FFTModel(signalFeatures, 0, 100);
 		}
 
 	}
@@ -61,7 +62,8 @@ public class SpecView extends View {
 		if (XN == 0) {
 			return;
 		}
-		int YN = list.get(0).getFftCeps().length;
+		int YN = list.get(0)
+				.getFftCeps().length;
 
 		float dX = originalWidth / XN;
 		float dY = originalHeight / YN;
@@ -74,12 +76,24 @@ public class SpecView extends View {
 		for (int i = 0; i < XN; i++) {
 			float top = 0;
 			float bottom = dY;
-			double[] doubles = list.get(i).getFftCeps();
+			double[] doubles = list.get(i)
+					.getFftCeps();
 			for (int j = YN - 1; 0 <= j; j--) {
-				int col = (int) ((doubles[j] - modelMin)/ dif *255);
+				int i2 = 30;
+				int i1 = 382- i2;
+				int col = (int) ((doubles[j] - modelMin) / dif * i1);
 
-				paint.setColor(Color.rgb(col, 255-col, 0));
-				canvas.drawRect(left, top, right, bottom, paint);
+				if (col != 0) {
+					col += i2;
+					if (col <= 255) {
+						paint.setColor(Color.argb(col, 0, 255, 0));
+					} else {
+						paint.setColor(Color.argb(col - 127, 255, 0, 0));
+					}
+					canvas.drawRect(left, top, right, bottom, paint);
+				}
+
+
 				top += dY;
 				bottom += dY;
 			}
