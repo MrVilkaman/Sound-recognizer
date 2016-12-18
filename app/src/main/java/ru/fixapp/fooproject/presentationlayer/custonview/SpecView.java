@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -36,11 +37,17 @@ public class SpecView extends View {
 		random = new Random();
 		paint = new Paint();
 
+
+		if (isInEditMode()) {
+			model = new FFTModel(Arrays.asList(new double[]{51,0,14,12,85,16,99}),0,100);
+		}
+
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+
 
 		if (model == null) {
 			return;

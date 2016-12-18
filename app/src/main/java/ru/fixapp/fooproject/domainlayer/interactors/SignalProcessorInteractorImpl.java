@@ -148,8 +148,14 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 					shortBuffer.get(shortBuff);
 					int length = shortBuffer.limit();
 					double[] doubleBuff = new double[length];
+//					double min = Double.MAX_VALUE;
+//					double max = Double.MIN_VALUE;
 					for (int i = 0; i < length; i++) {
-						doubleBuff[i] = shortBuff[i];
+						double magnitude = shortBuff[i];
+						magnitude /=Short.MAX_VALUE;
+						doubleBuff[i] = magnitude;
+//						min = Math.min(magnitude, min);
+//						max = Math.max(magnitude, max);
 					}
 
 					//					MFCC mfcc = new MFCC(512, 13, 13, audioSettings

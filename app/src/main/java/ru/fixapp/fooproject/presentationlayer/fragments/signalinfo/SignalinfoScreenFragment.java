@@ -1,12 +1,18 @@
 package ru.fixapp.fooproject.presentationlayer.fragments.signalinfo;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
 
 import java.util.List;
 
@@ -27,6 +33,7 @@ public class SignalinfoScreenFragment extends BaseFragment<SignalinfoPresenter>
 	@Inject SignalinfoPresenterCache cache;
 
 	@BindView(R.id.specView) SpecView specView;
+	@BindView(R.id.recording_audio_visualizerview) LineChart lineChart;
 
 
 	public static SignalinfoScreenFragment open(String absolutePath) {
@@ -70,5 +77,31 @@ public class SignalinfoScreenFragment extends BaseFragment<SignalinfoPresenter>
 	@Override
 	public void updateVisualizer(List<Entry> entries) {
 
+		LineDataSet dataSet = new LineDataSet(entries, "Label");
+		dataSet.setColor(Color.BLUE);
+		dataSet.setValueTextColor(Color.BLACK);
+		dataSet.setDrawCircles(false);
+		dataSet.setDrawCircleHole(false);
+		dataSet.setDrawHorizontalHighlightIndicator(false);
+
+		lineChart.getLegend()
+				.setEnabled(false);
+		Description desc = new Description();
+		desc.setText("");
+		lineChart.setDescription(desc);
+		lineChart.setDrawGridBackground(false);
+		lineChart.setVerticalScrollBarEnabled(false);
+		lineChart.setHorizontalScrollBarEnabled(false);
+
+
+		Highlight h1 = new Highlight(0, 0, 1);
+		Highlight h2 = new Highlight(0, 0, 2);
+		lineChart.highlightValues(new Highlight[]{h1, h2});
+		lineChart.setHighlightPerDragEnabled(false);
+
+
+		LineData lineData = new LineData(dataSet);
+		lineChart.setData(lineData);
+		lineChart.invalidate();
 	}
 }
