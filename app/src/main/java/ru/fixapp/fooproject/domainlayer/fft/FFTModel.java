@@ -6,9 +6,9 @@ public class FFTModel {
 
 	private final double min;
 	private final double max;
-	private final List<double[]> list;
+	private final List<SignalFeature> list;
 
-	public FFTModel(List<double[]> list, double min, double max) {
+	public FFTModel(List<SignalFeature> list, double min, double max) {
 		this.list = list;
 		this.min = min;
 		this.max = max;
@@ -22,7 +22,7 @@ public class FFTModel {
 		return max;
 	}
 
-	public List<double[]> getList() {
+	public List<SignalFeature> getList() {
 		return list;
 	}
 }

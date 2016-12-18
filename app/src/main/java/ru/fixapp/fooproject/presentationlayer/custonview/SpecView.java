@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 import ru.fixapp.fooproject.domainlayer.fft.FFTModel;
+import ru.fixapp.fooproject.domainlayer.fft.SignalFeature;
 
 public class SpecView extends View {
 
@@ -39,7 +40,9 @@ public class SpecView extends View {
 
 
 		if (isInEditMode()) {
-			model = new FFTModel(Arrays.asList(new double[]{51,0,14,12,85,16,99}),0,100);
+			List<SignalFeature> signalFeatures =
+					Arrays.asList(new SignalFeature(new double[]{51, 0, 14, 12, 85, 16, 99}, null));
+			model = new FFTModel(signalFeatures,0,100);
 		}
 
 	}
@@ -53,12 +56,12 @@ public class SpecView extends View {
 			return;
 		}
 
-		List<double[]> list = model.getList();
+		List<SignalFeature> list = model.getList();
 		int XN = list.size();
 		if (XN == 0) {
 			return;
 		}
-		int YN = list.get(0).length;
+		int YN = list.get(0).getFftCeps().length;
 
 		float dX = originalWidth / XN;
 		float dY = originalHeight / YN;
@@ -71,7 +74,7 @@ public class SpecView extends View {
 		for (int i = 0; i < XN; i++) {
 			float top = 0;
 			float bottom = dY;
-			double[] doubles = list.get(i);
+			double[] doubles = list.get(i).getFftCeps();
 			for (int j = YN - 1; 0 <= j; j--) {
 				int col = (int) ((doubles[j] - modelMin)/ dif *255);
 

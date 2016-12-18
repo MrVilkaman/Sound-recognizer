@@ -9,6 +9,8 @@ import java.util.List;
 import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.fft.Complex;
 import ru.fixapp.fooproject.domainlayer.fft.FFTModel;
+import ru.fixapp.fooproject.domainlayer.fft.MFCC;
+import ru.fixapp.fooproject.domainlayer.fft.SignalFeature;
 import ru.fixapp.fooproject.domainlayer.fft.Window;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
 import rx.Observable;
@@ -20,17 +22,22 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 	private final AudioSettings audioSettings;
 	private final int frameSize;
 	private final float overlapPresent;
+	private final MFCC mfcc;
+	private final int melBands;
 
 	public SignalProcessorInteractorImpl(AudioRepo recordDP, AudioSettings audioSettings) {
 		this.recordDP = recordDP;
 		this.audioSettings = audioSettings;
 		frameSize = 512;
 		overlapPresent = 0.5f;
+		int numCoeffs = 13;
+		melBands = 13;
+		mfcc = new MFCC(frameSize, numCoeffs, melBands, audioSettings.getSampleRate());
 	}
 
 	private FFTModel getFrame(double[] shortBuff) {
 
-		List<double[]> spectr = new ArrayList<>();
+		List<SignalFeature> spectr = new ArrayList<>();
 
 		int currentPos = 0;
 		boolean work = true;
@@ -58,18 +65,27 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 			//			}
 			int len = complices.length / 2 + 1;
 			double[] fr = new double[len];
-			for (int i = 0; i < len; i++) {
-				double magnitude = complices[i].getMagnitude();
-				min = Math.min(magnitude, min);
-				max = Math.max(magnitude, max);
-				fr[i] = magnitude;
-			}
-			spectr.add(fr);
-			currentPos = currentPos + (int) (frameSize*(1-overlapPresent));
-		}
-		//		Arrays.fill(shorts,frameSize,shortBuff.length, (short) 0);
+			double[] doubleBuff2 = new double[complices.length];
+			double[] doubleBuff2Im = new double[complices.length];
 
-		return new FFTModel(spectr,min,max);
+			for (int i = 0; i < complices.length; i++) {
+				Complex complice = complices[i];
+				doubleBuff2[i] = complice.getReal();
+				doubleBuff2Im[i] = complice.getImaginary();
+				if (i < len) {
+					double magnitude = complice.getMagnitude();
+					fr[i] = magnitude;
+					min = Math.min(magnitude, min);
+					max = Math.max(magnitude, max);
+				}
+			}
+			currentPos = currentPos + (int) (frameSize * (1 - overlapPresent));
+			double[] cepstrum = mfcc.cepstrum(doubleBuff2, doubleBuff2Im);
+			spectr.add(new SignalFeature(fr, cepstrum));
+		}
+
+
+		return new FFTModel(spectr, min, max);
 	}
 
 	private double getWindow(double n) {
@@ -150,28 +166,16 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 					shortBuffer.get(shortBuff);
 					int length = shortBuffer.limit();
 					double[] doubleBuff = new double[length];
-//					double min = Double.MAX_VALUE;
-//					double max = Double.MIN_VALUE;
+					//					double min = Double.MAX_VALUE;
+					//					double max = Double.MIN_VALUE;
 					for (int i = 0; i < length; i++) {
 						double magnitude = shortBuff[i];
-						magnitude /=Short.MAX_VALUE;
+						magnitude /= Short.MAX_VALUE;
 						doubleBuff[i] = magnitude;
-//						min = Math.min(magnitude, min);
-//						max = Math.max(magnitude, max);
+						//						min = Math.min(magnitude, min);
+						//						max = Math.max(magnitude, max);
 					}
 
-					//					MFCC mfcc = new MFCC(512, 13, 13, audioSettings
-					// .getSampleRate());
-					//
-					//					double[] doubleBuff2 = new double[frame.length];
-					//					double[] doubleBuff2Im = new double[frame.length];
-					//					for (int i = 0; i < frame.length; i++) {
-					//						doubleBuff2[i] = frame[i].getReal();
-					//						doubleBuff2Im[i] = frame[i].getImaginary();
-					//					}
-					//
-					//					double[] doubleBuff2Res = mfcc.cepstrum(doubleBuff2,
-					// doubleBuff2Im);
 					return getFrame(doubleBuff);
 				});
 	}
