@@ -26,44 +26,6 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 		frameSize = 512;
 	}
 
-	private short[] getFrame(short[] shortBuff) {
-		short[] shorts = new short[shortBuff.length];
-
-		int currentPos = 0;
-		boolean work = true;
-		while (work) {
-			int newPos = currentPos + frameSize;
-			work = newPos < shortBuff.length;
-			short[] range = Arrays.copyOfRange(shortBuff, currentPos, currentPos + frameSize);
-			short[] afterWindow = new short[range.length];
-			for (int i = 0; i < frameSize; i++) {
-				double gausse = getWindow(range[i]);
-				afterWindow[i] = (short) (gausse * range[i]);
-
-				//				if(Math.signum(range[i]) == -1){
-				//					int curre= currentPos;
-				//					curre++;
-				//				}
-			}
-
-			//			Complex[] complices = decimationInTime(afterWindow);
-			//			for (int i = 0; i < frameSize; i++) {
-			//				afterWindow[i] = (short) complices[i].getPhase();
-			//			}
-
-			if (work) {
-				System.arraycopy(afterWindow, 0, shorts, currentPos, afterWindow.length);
-			} else {
-				int length = shortBuff.length - currentPos;
-				System.arraycopy(afterWindow, 0, shorts, currentPos, length);
-			}
-			currentPos = newPos;
-		}
-		//		Arrays.fill(shorts,frameSize,shortBuff.length, (short) 0);
-
-		return shorts;
-	}
-
 	private Complex[] getFrame(double[] shortBuff) {
 		Complex[] shorts = new Complex[shortBuff.length / 2];
 
@@ -151,7 +113,6 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 
 		return spectrum;
 	}
-
 
 	@Override
 	public Observable<List<Entry>> getGraphInfo(String path) {
