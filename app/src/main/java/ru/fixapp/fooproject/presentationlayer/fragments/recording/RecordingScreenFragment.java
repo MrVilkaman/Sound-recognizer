@@ -30,6 +30,7 @@ import butterknife.OnTouch;
 import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
+import ru.fixapp.fooproject.presentationlayer.fragments.signalinfo.SignalinfoScreenFragment;
 
 public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		implements RecordingView {
@@ -111,7 +112,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 
 	@OnClick(R.id.recording_do_process)
 	void onClickDoProcess() {
-		getPresenter().doProcess();
+		getNavigation().showFragment(SignalinfoScreenFragment.open(cache.getPath()));
 	}
 
 	@OnTouch(R.id.recording_record)
@@ -175,6 +176,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 		Highlight h1 = new Highlight(0, 0, 1);
 		Highlight h2 = new Highlight(0, 0, 2);
 		lineChart.highlightValues(new Highlight[]{h1, h2});
+		lineChart.setHighlightPerDragEnabled(false);
 
 
 		LineData lineData = new LineData(dataSet);

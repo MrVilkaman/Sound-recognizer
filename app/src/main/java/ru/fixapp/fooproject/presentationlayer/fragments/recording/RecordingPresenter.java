@@ -10,7 +10,6 @@ import ru.fixapp.fooproject.datalayer.subscriber.ErrorSubscriber;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioPlayerInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.IAudioRecorderInteractor;
-import ru.fixapp.fooproject.domainlayer.interactors.SignalProcessorInteractor;
 import ru.fixapp.fooproject.presentationlayer.formaters.RecordsFormat;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
 import ru.fixapp.fooproject.presentationlayer.models.AudioModel;
@@ -21,7 +20,6 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	private final IAudioRecorderInteractor audioRecorder;
 	private final AudioPlayerInteractor audioPlayerInteractor;
 	private final AudioStorageInteractor storageInteractor;
-	private final SignalProcessorInteractor signalProcessorInteractor;
 
 	private final RecordingPresenterCache cache;
 	private final RecordsFormat recordsFormat;
@@ -30,12 +28,10 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 	public RecordingPresenter(IAudioRecorderInteractor audioRecorder,
 							  AudioPlayerInteractor audioPlayerInteractor,
 							  AudioStorageInteractor storageInteractor,
-							  SignalProcessorInteractor signalProcessorInteractor,
 							  RecordingPresenterCache cache, RecordsFormat recordsFormat) {
 		this.audioRecorder = audioRecorder;
 		this.audioPlayerInteractor = audioPlayerInteractor;
 		this.storageInteractor = storageInteractor;
-		this.signalProcessorInteractor = signalProcessorInteractor;
 		this.cache = cache;
 		this.recordsFormat = recordsFormat;
 	}
@@ -106,10 +102,6 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 		Observable<String> graphObs =
 				storageInteractor.cutAudio(cache.getPath(), cache.getStart(), cache.getEnd());
 		subscribeUI(graphObs, new CutAudioSubscriber(view(), cache));
-	}
-
-	public void doProcess() {
-
 	}
 }
 

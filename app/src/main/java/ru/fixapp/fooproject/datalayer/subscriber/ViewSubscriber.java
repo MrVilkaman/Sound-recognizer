@@ -5,14 +5,13 @@ import android.util.Log;
 import java.lang.ref.WeakReference;
 
 import ru.fixapp.fooproject.BuildConfig;
-import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseView;
 import ru.fixapp.fooproject.presentationlayer.utils.AppUtils;
 
 
 /**
  * Created by root on 15.03.16.
  */
-public class ViewSubscriber<V extends BaseView, T> extends rx.Subscriber<T> {
+public class ViewSubscriber<V, T> extends rx.Subscriber<T> {
 
 	private final WeakReference<V> viewRef;
 	private final String string;

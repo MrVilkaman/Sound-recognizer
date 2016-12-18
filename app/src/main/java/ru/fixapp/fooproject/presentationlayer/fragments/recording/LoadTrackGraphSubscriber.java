@@ -6,8 +6,8 @@ import java.util.List;
 
 import ru.fixapp.fooproject.datalayer.subscriber.ViewSubscriber;
 
-public class LoadTrackGraphSubscriber extends ViewSubscriber<RecordingView, List<Entry>> {
-	public LoadTrackGraphSubscriber(RecordingView view) {super(view);}
+public class LoadTrackGraphSubscriber extends ViewSubscriber<SpectrGraghView, List<Entry>> {
+	public LoadTrackGraphSubscriber(SpectrGraghView view) {super(view);}
 
 	@Override
 	public void onNext(List<Entry> entries) {
