@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 import ru.fixapp.fooproject.domainlayer.fft.FFTModel;
+import ru.fixapp.fooproject.domainlayer.fft.MinMaxModel;
 import ru.fixapp.fooproject.domainlayer.fft.SignalFeature;
 
 public class SpecView extends View {
@@ -41,9 +42,8 @@ public class SpecView extends View {
 
 		if (isInEditMode()) {
 			List<SignalFeature> signalFeatures =
-					Arrays.asList(new SignalFeature(new double[]{ 51, 14,0,12, 85, 16, 99,2,100},
-							null));
-			model = new FFTModel(signalFeatures, 0, 100);
+					Arrays.asList(new SignalFeature(new double[]{ 51, 14,0,12, 85, 16, 99,2,100}, new double[]{-45,12,5,-50,10}));
+			model = new FFTModel(signalFeatures, new MinMaxModel(0, 100),new MinMaxModel(-50, 10));
 		}
 
 	}
@@ -63,7 +63,7 @@ public class SpecView extends View {
 			return;
 		}
 		int YN = list.get(0)
-				.getFftCeps().length;
+				.getMelCeps().length;
 
 		float dX = originalWidth / XN;
 		float dY = originalHeight / YN;
@@ -71,13 +71,15 @@ public class SpecView extends View {
 		float left = 0;
 		float right = dX;
 
-		double dif = model.getMax() - model.getMin();
-		double modelMin = model.getMin();
+		MinMaxModel minMaxModel = model.getMfcc();
+
+		double dif = minMaxModel.getMax() - minMaxModel.getMin();
+		double modelMin = minMaxModel.getMin();
 		for (int i = 0; i < XN; i++) {
 			float top = 0;
 			float bottom = dY;
 			double[] doubles = list.get(i)
-					.getFftCeps();
+					.getMelCeps();
 			for (int j = YN - 1; 0 <= j; j--) {
 				int i2 = 30;
 				int i1 = 382- i2;
@@ -92,7 +94,6 @@ public class SpecView extends View {
 					}
 					canvas.drawRect(left, top, right, bottom, paint);
 				}
-
 
 				top += dY;
 				bottom += dY;

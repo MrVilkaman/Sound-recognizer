@@ -4,22 +4,23 @@ import java.util.List;
 
 public class FFTModel {
 
-	private final double min;
-	private final double max;
+
 	private final List<SignalFeature> list;
+	private final MinMaxModel fft;
+	private final MinMaxModel mfcc;
 
-	public FFTModel(List<SignalFeature> list, double min, double max) {
+	public FFTModel(List<SignalFeature> list, MinMaxModel fft, MinMaxModel mfcc) {
 		this.list = list;
-		this.min = min;
-		this.max = max;
+		this.fft = fft;
+		this.mfcc = mfcc;
 	}
 
-	public double getMin() {
-		return min;
+	public MinMaxModel getFft() {
+		return fft;
 	}
 
-	public double getMax() {
-		return max;
+	public MinMaxModel getMfcc() {
+		return mfcc;
 	}
 
 	public List<SignalFeature> getList() {

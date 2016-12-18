@@ -10,6 +10,7 @@ import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
 import ru.fixapp.fooproject.domainlayer.fft.Complex;
 import ru.fixapp.fooproject.domainlayer.fft.FFTModel;
 import ru.fixapp.fooproject.domainlayer.fft.MFCC;
+import ru.fixapp.fooproject.domainlayer.fft.MinMaxModel;
 import ru.fixapp.fooproject.domainlayer.fft.SignalFeature;
 import ru.fixapp.fooproject.domainlayer.fft.Window;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
@@ -41,8 +42,10 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 
 		int currentPos = 0;
 		boolean work = true;
-		double min = Double.MAX_VALUE;
-		double max = Double.MIN_VALUE;
+		double minFFT = Double.MAX_VALUE;
+		double maxFFT = Double.MIN_VALUE;
+		double minMFCC = Double.MAX_VALUE;
+		double maxMFCC = Double.MIN_VALUE;
 
 		while (work) {
 			int newPos = currentPos + frameSize;
@@ -75,17 +78,28 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 				if (i < len) {
 					double magnitude = complice.getMagnitude();
 					fr[i] = magnitude;
-					min = Math.min(magnitude, min);
-					max = Math.max(magnitude, max);
+					minFFT = Math.min(magnitude, minFFT);
+					maxFFT = Math.max(magnitude, maxFFT);
 				}
 			}
 			currentPos = currentPos + (int) (frameSize * (1 - overlapPresent));
 			double[] cepstrum = mfcc.cepstrum(doubleBuff2, doubleBuff2Im);
+
+			for (int i = 0; i < cepstrum.length; i++) {
+				double d1 = cepstrum[i];
+				if (!Double.isNaN(d1) && d1 != Double.NEGATIVE_INFINITY &&
+						d1 != Double.POSITIVE_INFINITY) {
+					minMFCC = Math.min(d1, minMFCC);
+					maxMFCC = Math.max(d1, maxMFCC);
+				}
+			}
+
 			spectr.add(new SignalFeature(fr, cepstrum));
 		}
 
 
-		return new FFTModel(spectr, min, max);
+		return new FFTModel(spectr, new MinMaxModel(minFFT, maxFFT),
+				new MinMaxModel(minMFCC, maxMFCC));
 	}
 
 	private double getWindow(double n) {
@@ -162,18 +176,14 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 		return recordDP.getFileStreamObservable(path)
 				.map(shortBuffer -> {
 					shortBuffer.rewind();
-					short[] shortBuff = new short[shortBuffer.limit()];
-					shortBuffer.get(shortBuff);
 					int length = shortBuffer.limit();
+					short[] shortBuff = new short[length];
+					shortBuffer.get(shortBuff);
 					double[] doubleBuff = new double[length];
-					//					double min = Double.MAX_VALUE;
-					//					double max = Double.MIN_VALUE;
 					for (int i = 0; i < length; i++) {
 						double magnitude = shortBuff[i];
 						magnitude /= Short.MAX_VALUE;
 						doubleBuff[i] = magnitude;
-						//						min = Math.min(magnitude, min);
-						//						max = Math.max(magnitude, max);
 					}
 
 					return getFrame(doubleBuff);
