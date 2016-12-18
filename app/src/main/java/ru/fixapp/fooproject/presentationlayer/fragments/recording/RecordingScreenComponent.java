@@ -32,13 +32,10 @@ public interface RecordingScreenComponent {
 	class RecordingScreenModule {
 
 		@PerScreen
-		@Provides AudioStorageInteractor provideAudioStorageInteractor(AudioRepo recordDP,
-																	   FileInfoConverter fileInfoConverter,
-																	   AudioSettings audioSettings,
-																	   SignalProcessorInteractor
-																					   processorInteractor){
-			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter, audioSettings,
-					processorInteractor);
+		@Provides
+		AudioStorageInteractor provideAudioStorageInteractor(AudioRepo recordDP,
+															 FileInfoConverter fileInfoConverter) {
+			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter);
 		}
 
 		@Provides
@@ -49,23 +46,24 @@ public interface RecordingScreenComponent {
 
 		@PerScreen
 		@Provides
-		AudioPlayerInteractor provideAudioPlayer(AudioSettings settings,
-												 AudioRepo audioRepo,
+		AudioPlayerInteractor provideAudioPlayer(AudioSettings settings, AudioRepo audioRepo,
 												 SignalProcessorInteractor
-														 signalProcessorInteractor){
+														 signalProcessorInteractor) {
 			return new AudioTrackPlayerInteractorImpl(settings, audioRepo,
 					signalProcessorInteractor);
 		}
 
 		@PerScreen
 		@Provides
-		RecordingPresenterCache provideRecordingPresenterCache(){
+		RecordingPresenterCache provideRecordingPresenterCache() {
 			return new RecordingPresenterCache();
 		}
+
 		@PerScreen
 		@Provides
-		SignalProcessorInteractor provideSignalProcesserInteractor(){
-			return new SignalProcessorInteractorImpl();
+		SignalProcessorInteractor provideSignalProcesserInteractor(AudioRepo audioRepo,
+																   AudioSettings settings) {
+			return new SignalProcessorInteractorImpl(audioRepo, settings);
 		}
 	}
 }

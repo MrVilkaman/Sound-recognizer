@@ -26,12 +26,8 @@ public interface SignalinfoScreenComponent {
 		@PerScreen
 		@Provides
 		AudioStorageInteractor provideAudioStorageInteractor(AudioRepo recordDP,
-															 FileInfoConverter fileInfoConverter,
-															 AudioSettings audioSettings,
-															 SignalProcessorInteractor
-																	 processorInteractor) {
-			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter, audioSettings,
-					processorInteractor);
+															 FileInfoConverter fileInfoConverter) {
+			return new AudioStorageInteractorImpl(recordDP, fileInfoConverter);
 		}
 
 		@PerScreen
@@ -42,8 +38,9 @@ public interface SignalinfoScreenComponent {
 
 		@PerScreen
 		@Provides
-		SignalProcessorInteractor provideSignalProcesserInteractor() {
-			return new SignalProcessorInteractorImpl();
+		SignalProcessorInteractor provideSignalProcesserInteractor(AudioRepo audioRepo,
+																   AudioSettings settings) {
+			return new SignalProcessorInteractorImpl(audioRepo, settings);
 		}
 		@PerScreen
 		@Provides

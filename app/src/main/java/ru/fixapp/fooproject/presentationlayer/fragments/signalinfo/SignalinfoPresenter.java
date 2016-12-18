@@ -7,21 +7,21 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractor;
+import ru.fixapp.fooproject.domainlayer.interactors.SignalProcessorInteractor;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BasePresenter;
 import ru.fixapp.fooproject.presentationlayer.fragments.recording.LoadTrackGraphSubscriber;
 import rx.Observable;
 
 public class SignalinfoPresenter extends BasePresenter<SignalinfoView> {
 
-	private final AudioStorageInteractor storageInteractor;
-	private SignalinfoPresenterCache cache;
+	private final SignalProcessorInteractor signalProcessorInteractor;
+	private final SignalinfoPresenterCache cache;
 
 
 	@Inject
-	public SignalinfoPresenter(AudioStorageInteractor storageInteractor,
+	public SignalinfoPresenter(SignalProcessorInteractor signalProcessorInteractor,
 							   SignalinfoPresenterCache cache) {
-		this.storageInteractor = storageInteractor;
+		this.signalProcessorInteractor = signalProcessorInteractor;
 		this.cache = cache;
 	}
 
@@ -29,7 +29,7 @@ public class SignalinfoPresenter extends BasePresenter<SignalinfoView> {
 	public void onViewAttached() {
 		super.onViewAttached();
 
-		Observable<List<Entry>> graphObs = storageInteractor.getGraphInfo(cache.getPath());
+		Observable<List<Entry>> graphObs = signalProcessorInteractor.getGraphFFTInfo(cache.getPath());
 		subscribeUI(graphObs, new LoadTrackGraphSubscriber(view()));
 	}
 }

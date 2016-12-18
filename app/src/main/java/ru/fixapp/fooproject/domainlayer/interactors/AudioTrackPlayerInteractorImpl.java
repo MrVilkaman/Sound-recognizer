@@ -31,17 +31,7 @@ public class AudioTrackPlayerInteractorImpl implements AudioPlayerInteractor {
 									boolean reply) {
 		inPlay = true;
 		Observable<ShortBuffer> fileStreamObservable =
-				audioRepo.getFileStreamObservable(pathToFile)
-						.map(shortBuffer -> {
-							ShortBuffer duplicate = shortBuffer.duplicate();
-							duplicate.rewind();
-							short[] shortBuff = new short[duplicate.limit()];
-							duplicate.get(shortBuff);
-							shortBuff = signalProcessorInteractor.getFrame(shortBuff);
-							duplicate.clear();
-							duplicate.put(shortBuff);
-							return shortBuffer;
-						});
+				audioRepo.getFileStreamObservable(pathToFile);
 		return Observable.combineLatest(getObjectObservable(),
 				fileStreamObservable,
 				(o, container) -> container)

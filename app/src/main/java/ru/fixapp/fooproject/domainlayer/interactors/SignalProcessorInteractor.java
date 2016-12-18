@@ -1,11 +1,15 @@
 package ru.fixapp.fooproject.domainlayer.interactors;
 
 
-import ru.fixapp.fooproject.domainlayer.fft.Complex;
+import com.github.mikephil.charting.data.Entry;
+
+import java.util.List;
+
+import rx.Observable;
 
 public interface SignalProcessorInteractor {
 
-	short[] getFrame(short[] shortBuff);
+	Observable<List<Entry>> getGraphInfo(String path);
 
-	Complex[] getFrame(double[] shortBuff);
+	Observable<List<Entry>> getGraphFFTInfo(String path);
 }
