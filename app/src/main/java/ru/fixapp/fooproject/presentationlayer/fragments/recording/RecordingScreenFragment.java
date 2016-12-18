@@ -40,7 +40,7 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@Inject RecordingPresenterCache cache;
 
 	@BindView(R.id.recording_audio_info) TextView textView;
-	@BindView(R.id.recording_audio_info_2) TextView textView2;
+	@BindView(R.id.recording_audio_info_2) Button textView2;
 	@BindView(R.id.recording_record) View recordButton;
 	@BindView(R.id.recording_play) Button playButton;
 	@BindView(R.id.recording_check) CheckBox playCheck;
@@ -103,6 +103,11 @@ public class RecordingScreenFragment extends BaseFragment<RecordingPresenter>
 	@OnClick(R.id.recording_play)
 	void onClickPlay() {
 		getPresenter().playLastAudio();
+	}
+
+	@OnClick(R.id.recording_audio_info_2)
+	void onClickClear() {
+		getPresenter().clearTime();
 	}
 
 	@OnClick(R.id.recording_cut)

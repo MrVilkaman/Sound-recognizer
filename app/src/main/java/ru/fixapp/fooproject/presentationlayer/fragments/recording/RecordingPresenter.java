@@ -108,5 +108,11 @@ public class RecordingPresenter extends BasePresenter<RecordingView> {
 				storageInteractor.cutAudio(cache.getPath(), cache.getStart(), cache.getEnd());
 		subscribeUI(graphObs, new CutAudioSubscriber(view(), cache));
 	}
+
+	public void clearTime() {
+		cache.setStart(0);
+		cache.setEnd(cache.getSampleCount());
+		update();
+	}
 }
 
