@@ -19,11 +19,13 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 	private final AudioRepo recordDP;
 	private final AudioSettings audioSettings;
 	private final int frameSize;
+	private final float overlapPresent;
 
 	public SignalProcessorInteractorImpl(AudioRepo recordDP, AudioSettings audioSettings) {
 		this.recordDP = recordDP;
 		this.audioSettings = audioSettings;
 		frameSize = 512;
+		overlapPresent = 0.5f;
 	}
 
 	private FFTModel getFrame(double[] shortBuff) {
@@ -63,7 +65,7 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 				fr[i] = magnitude;
 			}
 			spectr.add(fr);
-			currentPos = newPos;
+			currentPos = currentPos + (int) (frameSize*(1-overlapPresent));
 		}
 		//		Arrays.fill(shorts,frameSize,shortBuff.length, (short) 0);
 
