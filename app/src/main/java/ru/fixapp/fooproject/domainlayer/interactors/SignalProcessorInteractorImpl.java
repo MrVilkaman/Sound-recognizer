@@ -26,13 +26,15 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 	private final MFCC mfcc;
 	private final int melBands;
 
+	private boolean removeFirst = true;
+
 	public SignalProcessorInteractorImpl(AudioRepo recordDP, AudioSettings audioSettings) {
 		this.recordDP = recordDP;
 		this.audioSettings = audioSettings;
 		frameSize = 512;
 		overlapPresent = 0.5f;
-		int numCoeffs = 13;
-		melBands = 13;
+		int numCoeffs = 25;
+		melBands = 25;
 		mfcc = new MFCC(frameSize, numCoeffs, melBands, audioSettings.getSampleRate());
 	}
 
@@ -66,16 +68,16 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 			//			for (int i = 0; i < frameSize; i++) {
 			//				afterWindow[i] = (short) complices[i].getPhase();
 			//			}
-			int len = complices.length / 2 + 1;
+			int len = complices.length / 2;
 			double[] fr = new double[len];
-			double[] doubleBuff2 = new double[complices.length];
-			double[] doubleBuff2Im = new double[complices.length];
+			double[] doubleBuff2 = new double[len];
+			double[] doubleBuff2Im = new double[len];
 
 			for (int i = 0; i < complices.length; i++) {
-				Complex complice = complices[i];
-				doubleBuff2[i] = complice.getReal();
-				doubleBuff2Im[i] = complice.getImaginary();
 				if (i < len) {
+					Complex complice = complices[i];
+					doubleBuff2[i] = complice.getReal();
+					doubleBuff2Im[i] = complice.getImaginary();
 					double magnitude = complice.getMagnitude();
 					fr[i] = magnitude;
 					minFFT = Math.min(magnitude, minFFT);
@@ -87,7 +89,7 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 
 			for (int i = 0; i < cepstrum.length; i++) {
 				double d1 = cepstrum[i];
-				if (!Double.isNaN(d1) && d1 != Double.NEGATIVE_INFINITY &&
+				if ((!removeFirst || i != 0) &&  !Double.isNaN(d1) && d1 != Double.NEGATIVE_INFINITY &&
 						d1 != Double.POSITIVE_INFINITY) {
 					minMFCC = Math.min(d1, minMFCC);
 					maxMFCC = Math.max(d1, maxMFCC);
@@ -182,7 +184,7 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 					double[] doubleBuff = new double[length];
 					for (int i = 0; i < length; i++) {
 						double magnitude = shortBuff[i];
-						magnitude /= Short.MAX_VALUE;
+//						magnitude /= Short.MAX_VALUE;
 						doubleBuff[i] = magnitude;
 					}
 

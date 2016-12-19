@@ -10,6 +10,7 @@ import ru.fixapp.fooproject.R;
 import ru.fixapp.fooproject.presentationlayer.activities.BaseActivityView;
 import ru.fixapp.fooproject.presentationlayer.fragments.core.BaseFragment;
 import ru.fixapp.fooproject.presentationlayer.fragments.recordslist.RecordListScreenFragment;
+import ru.fixapp.fooproject.presentationlayer.fragments.signalinfo.SignalinfoScreenFragment;
 import ru.fixapp.fooproject.presentationlayer.resolution.UIResolver;
 import ru.fixapp.fooproject.presentationlayer.resolution.drawer.LeftDrawerHelper;
 import ru.fixapp.fooproject.presentationlayer.resolution.fragments.FragmentResolver;
@@ -68,7 +69,7 @@ public class NavigationResolverImpl implements NavigationResolver {
 		if (BuildConfig.DEBUG) {
 			String absolutePath =
 					"/storage/emulated/0/Android/data/ru.fixapp.fooproject/files/audio/1e397fff-36c0-4a7c-8bf3-f2e9f32dc217.3gpp";
-//			return SignalinfoScreenFragment.open(absolutePath);
+			return SignalinfoScreenFragment.open(absolutePath);
 //			return RecordingScreenFragment.open(absolutePath);
 		}
 		return RecordListScreenFragment.open();

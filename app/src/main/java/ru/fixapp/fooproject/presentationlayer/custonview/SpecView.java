@@ -18,6 +18,9 @@ import ru.fixapp.fooproject.domainlayer.fft.SignalFeature;
 
 public class SpecView extends View {
 
+	private boolean fft = false;
+
+
 	private float originalWidth;
 	private float originalHeight;
 	private Paint paint;
@@ -38,7 +41,6 @@ public class SpecView extends View {
 
 		random = new Random();
 		paint = new Paint();
-
 
 		if (isInEditMode()) {
 			List<SignalFeature> signalFeatures =
@@ -62,8 +64,9 @@ public class SpecView extends View {
 		if (XN == 0) {
 			return;
 		}
-		int YN = list.get(0)
-				.getMelCeps().length;
+		SignalFeature signalFeature = list.get(0);
+		double[] fftCeps = getDoubles(signalFeature);
+		int YN = fftCeps.length;
 
 		float dX = originalWidth / XN;
 		float dY = originalHeight / YN;
@@ -71,15 +74,20 @@ public class SpecView extends View {
 		float left = 0;
 		float right = dX;
 
-		MinMaxModel minMaxModel = model.getMfcc();
+		MinMaxModel minMaxModel;
+		if (fft) {
+			minMaxModel = model.getFft();
+		}else{
+			minMaxModel = model.getMfcc();
+		}
 
 		double dif = minMaxModel.getMax() - minMaxModel.getMin();
 		double modelMin = minMaxModel.getMin();
 		for (int i = 0; i < XN; i++) {
 			float top = 0;
 			float bottom = dY;
-			double[] doubles = list.get(i)
-					.getMelCeps();
+			double[] doubles;
+			doubles = getDoubles(list.get(i));
 			for (int j = YN - 1; 0 <= j; j--) {
 				int i2 = 30;
 				int i1 = 382- i2;
@@ -104,6 +112,15 @@ public class SpecView extends View {
 
 	}
 
+	private double[] getDoubles(SignalFeature signalFeature) {
+		double[] doubles;
+		if (fft){
+			doubles = signalFeature.getFftCeps();
+		}else{
+			doubles = signalFeature.getMelCeps();
+		}
+		return doubles;
+	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
