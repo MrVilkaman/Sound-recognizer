@@ -13,4 +13,6 @@ public interface SignalProcessorInteractor {
 	Observable<List<Entry>> getGraphInfo(String path);
 
 	Observable<FFTModel> getGraphFFTInfo(String path);
+
+	Observable<Void> calcCos(List<double[]> mel);
 }

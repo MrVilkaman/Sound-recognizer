@@ -11,6 +11,7 @@ import ru.fixapp.fooproject.domainlayer.interactors.AudioStorageInteractorImpl;
 import ru.fixapp.fooproject.domainlayer.interactors.SignalProcessorInteractor;
 import ru.fixapp.fooproject.domainlayer.interactors.SignalProcessorInteractorImpl;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
+import ru.fixapp.fooproject.domainlayer.providers.SchedulersProvider;
 import ru.fixapp.fooproject.presentationlayer.activities.ActivityComponent;
 
 @PerScreen
@@ -31,8 +32,9 @@ public interface RecordListScreenComponent {
 		@PerScreen
 		@Provides
 		SignalProcessorInteractor provideSignalProcesserInteractor(AudioRepo recordDP,
-																   AudioSettings audioSettings){
-			return new SignalProcessorInteractorImpl(recordDP, audioSettings);
+																   AudioSettings audioSettings,
+																   SchedulersProvider schedulers){
+			return new SignalProcessorInteractorImpl(recordDP, audioSettings, schedulers);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package ru.fixapp.fooproject.domainlayer.interactors;
 
+import android.util.Log;
+
 import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
@@ -14,13 +16,17 @@ import ru.fixapp.fooproject.domainlayer.fft.MinMaxModel;
 import ru.fixapp.fooproject.domainlayer.fft.SignalFeature;
 import ru.fixapp.fooproject.domainlayer.fft.Window;
 import ru.fixapp.fooproject.domainlayer.models.AudioSettings;
+import ru.fixapp.fooproject.domainlayer.providers.SchedulersProvider;
 import rx.Observable;
 
 public class SignalProcessorInteractorImpl implements SignalProcessorInteractor {
 
 	public static final double DoublePi = 2 * Math.PI;
+
 	private final AudioRepo recordDP;
 	private final AudioSettings audioSettings;
+	private final SchedulersProvider schedulers;
+
 	private final int frameSize;
 	private final float overlapPresent;
 	private final MFCC mfcc;
@@ -28,9 +34,11 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 
 	private boolean removeFirst = true;
 
-	public SignalProcessorInteractorImpl(AudioRepo recordDP, AudioSettings audioSettings) {
+	public SignalProcessorInteractorImpl(AudioRepo recordDP, AudioSettings audioSettings,
+										 SchedulersProvider schedulers) {
 		this.recordDP = recordDP;
 		this.audioSettings = audioSettings;
+		this.schedulers = schedulers;
 		frameSize = 512;
 		overlapPresent = 0.5f;
 		int numCoeffs = 25;
@@ -89,7 +97,8 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 
 			for (int i = 0; i < cepstrum.length; i++) {
 				double d1 = cepstrum[i];
-				if ((!removeFirst || i != 0) &&  !Double.isNaN(d1) && d1 != Double.NEGATIVE_INFINITY &&
+				if ((!removeFirst || i != 0) && !Double.isNaN(d1) &&
+						d1 != Double.NEGATIVE_INFINITY &&
 						d1 != Double.POSITIVE_INFINITY) {
 					minMFCC = Math.min(d1, minMFCC);
 					maxMFCC = Math.max(d1, maxMFCC);
@@ -184,7 +193,7 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 					double[] doubleBuff = new double[length];
 					for (int i = 0; i < length; i++) {
 						double magnitude = shortBuff[i];
-//						magnitude /= Short.MAX_VALUE;
+						//						magnitude /= Short.MAX_VALUE;
 						doubleBuff[i] = magnitude;
 					}
 
@@ -192,4 +201,55 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 				});
 	}
 
+	@Override
+	public Observable<Void> calcCos(List<double[]> mel) {
+		return Observable.fromCallable(() -> mel)
+				.subscribeOn(schedulers.computation())
+				.map(doubles -> {
+					double[][] res = new double[doubles.size()][doubles.size()];
+					for (int i = 0; i < doubles.size(); i++) {
+						res[i] = new double[doubles.size()];
+						double[] mel1 = doubles.get(i);
+						for (int j = i+1; j < doubles.size(); j++) {
+							double[] mel2 = doubles.get(j);
+							res[i][j] = doCalc(mel1, mel2);
+						}
+					}
+					printGrid(res);
+					return res;
+				})
+				.map(doubles -> null);
+	}
+
+	public void printGrid(double[][] res) {
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < res.length; i++) {
+			double[] row = res[i];
+			for (int j = 0; j < row.length; j++) {
+				double block = row[j];
+				buf.append(String.format("%2.3f ", block));
+				if (j >= row.length - 1) {
+					buf.append("\n");
+				}
+			}
+		}
+		Log.d("QWER", buf.toString());
+	}
+
+	private double doCalc(double[] mel1, double[] mel2) {
+		if (mel1.length != mel2.length) {
+			throw new ArithmeticException("size in differed");
+		}
+		double sum = dot(mel1, mel2);
+
+		return sum / Math.sqrt(dot(mel1, mel1)) / Math.sqrt(dot(mel2, mel2));
+	}
+
+	private double dot(double[] mel1, double[] mel2) {
+		double sum = 0;
+		for (int i = 0; i < mel1.length; i++) {
+			sum += mel1[i] * mel2[i];
+		}
+		return sum;
+	}
 }
