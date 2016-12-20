@@ -6,6 +6,7 @@ import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import ru.fixapp.fooproject.datalayer.repository.AudioRepo;
@@ -105,7 +106,8 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 				}
 			}
 
-			spectr.add(new SignalFeature(fr, cepstrum));
+			spectr.add(new SignalFeature(fr,
+					removeFirst ? Arrays.copyOfRange(cepstrum, 1, cepstrum.length) : cepstrum));
 		}
 
 
@@ -207,19 +209,132 @@ public class SignalProcessorInteractorImpl implements SignalProcessorInteractor 
 				.subscribeOn(schedulers.computation())
 				.map(doubles -> {
 					double[][] res = new double[doubles.size()][doubles.size()];
-					for (int i = 0; i < doubles.size(); i++) {
+					double min = Double.MAX_VALUE;
+					double max = Double.MIN_VALUE;
+
+
+					List<Double> array = new ArrayList();
+					for (int i = 0; i < doubles.size() - 1; i++) {
 						res[i] = new double[doubles.size()];
 						double[] mel1 = doubles.get(i);
-						for (int j = i+1; j < doubles.size(); j++) {
+						for (int j = i + 1; j < doubles.size(); j++) {
 							double[] mel2 = doubles.get(j);
-							res[i][j] = doCalc(mel1, mel2);
+							double v = doCalc(mel1, mel2);
+							min = Math.min(v, min);
+							max = Math.max(v, max);
+							array.add(v);
+							res[i][j] = v;
 						}
 					}
 					printGrid(res);
+
+					Collections.sort(array);
+
+					Log.d("QWER",
+							String.format("min %2.3f | ", min) + String.format("min %2.3f ", max));
+					double ave = ave(array);
+					Log.d("QWER", String.format("ave %2.3f | ", ave) +
+							String.format("min %2.3f ", median(array)));
+
+					removeFormGrid(res, ave);
+					printGrid(res);
+
+
+					List<List<Double>> lists = getSet(res);
+
 					return res;
 				})
 				.map(doubles -> null);
 	}
+
+	int n = 0;
+	boolean[] usd;
+	List<List<Integer>> lists;
+
+	private List<List<Double>> getSet(double[][] res) {
+		n = res.length;
+		usd = new boolean[n];
+		lists = new ArrayList<>(n);
+		for (int i = 0; i < n; i++) {
+			lists.add(new ArrayList<>());
+		}
+
+
+		input(res);
+		int i = connected_components_amount_dfs();
+		Log.d("QWER", "ответ = "+i );
+		return null;
+	}
+
+	private void input(double[][] res) {
+
+		for (int i = 0; i < res.length; i++) {
+			double[] row = res[i];
+			for (int j = i + 1; j < row.length; j++) {
+				double block = row[j];
+				if (0.00001f < block) {
+					lists.get(i).add(j);
+					lists.get(j).add(i);
+				}
+			}
+		}
+
+
+	}
+
+	void dfs(int cur) {
+		usd[cur] = true;
+		for (int i = 0; i < lists.get(cur)
+				.size(); ++i) {
+			int nxt = lists.get(cur)
+					.get(i);
+			if (!usd[nxt])
+				dfs(nxt);
+		}
+	}
+
+	// поиск количества компонент связности с помощью поиска в глубину
+	int connected_components_amount_dfs() {
+		int cnt = 0;
+		for (int i = 0; i < n; ++i) {
+			if (!usd[i]) {
+				dfs(i);
+				++cnt;
+			}
+		}
+		return cnt;
+	}
+
+
+	private void removeFormGrid(double[][] res, double ave) {
+		for (int i = 0; i < res.length; i++) {
+			double[] row = res[i];
+			for (int j = i + 1; j < row.length; j++) {
+				double block = row[j];
+				if (block < ave) {
+					row[j] = 0;
+				}
+			}
+		}
+	}
+
+	public double ave(List<Double> m) {
+		double sum = 0;
+		for (int i = 0; i < m.size(); i++) {
+			sum += m.get(i);
+		}
+		return sum / m.size();
+	}
+
+	public double median(List<Double> m) {
+		int middle = m.size() / 2;
+		if (m.size() % 2 == 1) {
+			return m.get(middle);
+		} else {
+			return (m.get(middle - 1) + m.get(middle)) / 2.0;
+		}
+	}
+
 
 	public void printGrid(double[][] res) {
 		StringBuffer buf = new StringBuffer();

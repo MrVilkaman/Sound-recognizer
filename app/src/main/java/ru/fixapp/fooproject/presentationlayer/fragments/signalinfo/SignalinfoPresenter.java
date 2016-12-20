@@ -32,7 +32,11 @@ public class SignalinfoPresenter extends BasePresenter<SignalinfoView> {
 						new double[]{2, 0},
 						new double[]{1, 4},
 						new double[]{2, 4},
-						new double[]{10, 10});
+						new double[]{10, 10},
+						new double[]{1, 2},
+						new double[]{3, 0},
+						new double[]{3, 1},
+						new double[]{10, 1});
 		cache.setMel(mel);
 		calcCos();
 //		Observable<List<Entry>> graphObs2 = signProI.getGraphInfo(cache.getPath());
